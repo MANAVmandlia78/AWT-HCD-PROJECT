@@ -69,17 +69,12 @@ const Room = () => {
       };
 
       pc.ontrack = (event) => {
-        const { track } = event;
-        if (!track) return;
-        let stream = remoteStreamRef.current;
-        if (!stream) {
-          stream = new MediaStream();
-          remoteStreamRef.current = stream;
-        }
-        const exists = stream.getTracks().some((t) => t.id === track.id);
-        if (!exists) stream.addTrack(track);
-        setRemoteStream(stream);
-      };
+  const stream = event.streams[0];
+  if (stream) {
+    setRemoteStream(stream);
+    remoteStreamRef.current = stream;
+  }
+};
 
       peersRef.current.set(remoteSocketId, pc);
       return pc;
@@ -354,7 +349,7 @@ const Room = () => {
                   if (video) video.srcObject = singleScreenStream;
                 }}
                 autoPlay
-                // muted
+                muted
                 playsInline
                 className="video-el"
               />
