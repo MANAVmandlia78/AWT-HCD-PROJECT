@@ -1,5 +1,12 @@
 import React from "react";
 import "../Styles/sidebar.css";
+import { TfiDashboard } from "react-icons/tfi";
+import { FaBook } from "react-icons/fa6";
+import { FaRegCalendarAlt } from "react-icons/fa";
+import { MdNotificationsActive } from "react-icons/md";
+import { IoPersonCircleOutline } from "react-icons/io5";
+import { MdOutlineSettings } from "react-icons/md";
+import { CiLogout } from "react-icons/ci";
 
 const Sidebar = () => {
   return (
@@ -7,8 +14,7 @@ const Sidebar = () => {
       {/* LOGO */}
       <div className="sidebar-logo">
         <div className="logo-wrap">
-          <div className="logo-icon">🎓</div>
-          <span className="logo-text">ClassConnect</span>
+          <span className="logo-text">Class-Connect</span>
         </div>
       </div>
 
@@ -16,22 +22,22 @@ const Sidebar = () => {
       <div className="nav-section-label">Main</div>
 
       <a className="nav-item" href="#">
-        <span>🏠</span>
+        <span><TfiDashboard /></span>
         <span>Dashboard</span>
       </a>
 
       <a className="nav-item active" href="#">
-        <span>📚</span>
+        <span><FaBook /></span>
         <span>Courses</span>
       </a>
 
       <a className="nav-item" href="#">
-        <span>📅</span>
+        <span><FaRegCalendarAlt /></span>
         <span>Calendar</span>
       </a>
 
       <a className="nav-item" href="#">
-        <span>🔔</span>
+        <span><MdNotificationsActive /></span>
         <span>Announcements</span>
         <span className="nav-badge">3</span>
       </a>
@@ -40,17 +46,17 @@ const Sidebar = () => {
       <div className="nav-section-label">Account</div>
 
       <a className="nav-item" href="#">
-        <span>👤</span>
+        <span><IoPersonCircleOutline /></span>
         <span>Profile</span>
       </a>
 
       <a className="nav-item" href="#">
-        <span>⚙️</span>
+        <span><MdOutlineSettings /></span>
         <span>Settings</span>
       </a>
 
       <a className="nav-item" href="#">
-        <span>🚪</span>
+        <span><CiLogout /></span>
         <span>Logout</span>
       </a>
 
