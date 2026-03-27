@@ -6,6 +6,7 @@ import HowItWorks from "../Components/HowItWorks";
 import Showcase from "../Components/Showcase";
 import WhyUs from "../Components/WhyUs";
 import Footer from "../Components/Footer";
+import Sidebar from '../Components/Sidebar'
 import "../Styles/Landingpage.css"
 // import './index.css'
 
