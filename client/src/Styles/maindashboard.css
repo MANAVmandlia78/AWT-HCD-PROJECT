@@ -1,0 +1,169 @@
+/* MAIN */
+.main {
+  margin-left: var(--sidebar-width);
+  width: calc(100% - var(--sidebar-width));
+  min-height: 100vh;
+  background: #fff;
+}
+
+/* TOPBAR */
+.topbar {
+  height: 77px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 24px;
+  border-bottom: 2px solid #000; /* softer */
+  background: #fff;
+}
+
+/* TITLE */
+.topbar-title {
+  font-size: 20px;
+  font-weight: 800; /* slightly reduced */
+  flex: 1;
+}
+
+/* SEARCH */
+.search-box {
+  border: 2px solid #000; /* softer */
+  border-radius: 8px; /* 👈 softness */
+  padding: 6px 10px;
+  width: 220px;
+  background: #fff;
+}
+
+.search-box input {
+  border: none;
+  outline: none;
+  font-weight: 600;
+  width: 100%;
+}
+
+/* ACTIONS */
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ICON BUTTON */
+.icon-btn {
+  width: 38px;
+  height: 38px;
+  border: 2px solid #000;
+  border-radius: 8px; /* 👈 softness */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  font-weight: bold;
+}
+
+/* HOVER (soft push) */
+.icon-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 3px 3px 0 #000;
+}
+
+/* NOTIFICATION DOT */
+.notif-dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 7px;
+  height: 7px;
+  background: #000;
+  border-radius: 50%;
+}
+
+/* BUTTON */
+.btn-primary {
+  border: 2px solid #000;
+  border-radius: 8px;
+  background: #fff;
+  padding: 6px 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* BUTTON HOVER */
+.btn-primary:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 3px 3px 0 #000;
+}
+
+/* AVATAR */
+.topbar-avatar {
+  width: 38px;
+  height: 38px;
+  border: 2px solid #000;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+}
+
+/* CONTENT */
+.content {
+  padding: 20px; /* reduced */
+}
+
+/* FILTERS */
+.filters-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+/* FILTER SEARCH */
+.filter-search {
+  border: 2px solid #000;
+  border-radius: 8px;
+  padding: 6px 10px;
+  width: 260px;
+}
+
+.filter-search input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-weight: 600;
+}
+
+/* SELECT */
+.select-box {
+  border: 2px solid #000;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* HOVER */
+.select-box:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 3px 3px 0 #000;
+}
+
+/* GRID */
+.courses-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px; /* reduced from 50px 🔥 */
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .courses-grid {
+    gap: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .courses-grid {
+    flex-direction: column;
+  }
+}

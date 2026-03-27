@@ -1,12 +1,14 @@
 import Sidebar from '../Components/Sidebar'
-import "../Styles/Landingpage.css"
+import Maindashboard from '../Components/Maindashboard'
+import "../Styles/LMSmain.css"
 
 import React from 'react'
 
 const LMSmain = () => {
   return (
-    <div>
+    <div className="lms-layout">
         <Sidebar></Sidebar>
+        <Maindashboard></Maindashboard>
     </div>
   )
 }

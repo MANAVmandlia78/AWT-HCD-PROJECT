@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "../Styles/sidebar.css";
 import { TfiDashboard } from "react-icons/tfi";
 import { FaBook } from "react-icons/fa6";
@@ -9,67 +9,72 @@ import { MdOutlineSettings } from "react-icons/md";
 import { CiLogout } from "react-icons/ci";
 
 const Sidebar = () => {
+  const [active, setActive] = useState("Courses");
+
+  const menuItems = [
+    { name: "Dashboard", icon: <TfiDashboard /> },
+    { name: "Courses", icon: <FaBook /> },
+    { name: "Calendar", icon: <FaRegCalendarAlt /> },
+    { name: "Announcements", icon: <MdNotificationsActive />, badge: 3 },
+  ];
+
+  const accountItems = [
+    { name: "Profile", icon: <IoPersonCircleOutline /> },
+    { name: "Settings", icon: <MdOutlineSettings /> },
+    { name: "Logout", icon: <CiLogout /> },
+  ];
+
   return (
     <aside className="sidebar">
+
       {/* LOGO */}
       <div className="sidebar-logo">
         <div className="logo-wrap">
-          <span className="logo-text">Class-Connect</span>
+          <div className="logo-icon">CC</div>
+          <span className="logo-text">Class Connect</span>
         </div>
       </div>
 
       {/* MAIN */}
-      <div className="nav-section-label">Main</div>
+      <div className="nav-section-label">MAIN</div>
 
-      <a className="nav-item" href="#">
-        <span><TfiDashboard /></span>
-        <span>Dashboard</span>
-      </a>
-
-      <a className="nav-item active" href="#">
-        <span><FaBook /></span>
-        <span>Courses</span>
-      </a>
-
-      <a className="nav-item" href="#">
-        <span><FaRegCalendarAlt /></span>
-        <span>Calendar</span>
-      </a>
-
-      <a className="nav-item" href="#">
-        <span><MdNotificationsActive /></span>
-        <span>Announcements</span>
-        <span className="nav-badge">3</span>
-      </a>
+      {menuItems.map((item) => (
+        <div
+          key={item.name}
+          className={`nav-item ${active === item.name ? "active" : ""}`}
+          onClick={() => setActive(item.name)}
+        >
+          <span className="nav-icon">{item.icon}</span>
+          <span>{item.name}</span>
+          {item.badge && <span className="nav-badge">{item.badge}</span>}
+        </div>
+      ))}
 
       {/* ACCOUNT */}
-      <div className="nav-section-label">Account</div>
+      <div className="nav-section-label">ACCOUNT</div>
 
-      <a className="nav-item" href="#">
-        <span><IoPersonCircleOutline /></span>
-        <span>Profile</span>
-      </a>
-
-      <a className="nav-item" href="#">
-        <span><MdOutlineSettings /></span>
-        <span>Settings</span>
-      </a>
-
-      <a className="nav-item" href="#">
-        <span><CiLogout /></span>
-        <span>Logout</span>
-      </a>
+      {accountItems.map((item) => (
+        <div
+          key={item.name}
+          className={`nav-item ${active === item.name ? "active" : ""}`}
+          onClick={() => setActive(item.name)}
+        >
+          <span className="nav-icon">{item.icon}</span>
+          <span>{item.name}</span>
+        </div>
+      ))}
 
       {/* USER */}
       <div className="sidebar-bottom">
         <div className="user-mini">
           <div className="user-avatar-sm">SH</div>
           <div className="user-mini-info">
-            <div className="user-mini-name">Salman H.</div>
-            <div className="user-mini-role">Instructor</div>
+            <div className="user-mini-name">SALMAN H.</div>
+            <div className="user-mini-role">INSTRUCTOR</div>
           </div>
         </div>
       </div>
+
     </aside>
   );
 };
