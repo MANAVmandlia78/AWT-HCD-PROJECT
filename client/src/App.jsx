@@ -1,6 +1,7 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Home from "./Pages/Home";
+import LandingPage from "./Pages/LandingPage";
 import Room from "./Pages/Room";
 import { SocketProvider } from "./Providers/Socket";
 import { PeerProvider } from "./Providers/Peer";
@@ -11,7 +12,8 @@ const App = () => {
       <SocketProvider>
         <PeerProvider>
           <Routes>
-            <Route path="/" element={<Home></Home>}></Route>
+            <Route path="/" element={<LandingPage></LandingPage>}></Route>
+            <Route path="/home" element={<Home></Home>}></Route>
             <Route path="/room/:roomId" element={<Room></Room>}></Route>
           </Routes>
         </PeerProvider>

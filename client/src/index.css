@@ -1,10 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap');
+@import "tailwindcss";
 
 /* ===== RESET & BASE ===== */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  /* overflow-x: hidden; */
 }
 
 :root {
@@ -51,6 +53,16 @@ body {
   display: flex;
   min-height: 100vh;
   width: 100vw;
+}
+
+.logoimage{
+width: 100px;
+height: 100px;
+}
+
+.logoimage2{
+width: 180px;
+height: 100px;
 }
 
 /* --- Left Panel --- */
