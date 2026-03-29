@@ -1,8 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700;800&display=swap');
 /* MAIN */
 .main {
   margin-left: var(--sidebar-width);
   width: calc(100% - var(--sidebar-width));
   min-height: 100vh;
+  font-family: 'Comic Neue', sans-serif;
   background: #fff;
 }
 
@@ -152,7 +154,7 @@
 .courses-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px; /* reduced from 50px 🔥 */
+  gap: 50px; /* reduced from 50px 🔥 */
 }
 
 /* RESPONSIVE */

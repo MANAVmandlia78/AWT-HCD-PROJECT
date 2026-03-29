@@ -1,0 +1,247 @@
+/* FONT */
+* {
+  font-family: "Comic Sans MS", "Comic Sans", cursive !important;
+}
+
+/* MAIN */
+.course-detail {
+  margin-left: var(--sidebar-width);
+  padding: 40px 36px;
+  background: #fafafa;
+  min-height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* HEADER */
+.course-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  width: 70vw;
+  border: 2px solid #222;
+  border-radius: 16px;
+  padding: 28px 32px;
+  box-shadow: 5px 5px 0 #222;
+  margin-bottom: 40px;
+  background: #fff;
+}
+
+/* LEFT */
+.course-header-left h1 {
+  font-size: 28px;
+  font-weight: 900;
+  line-height: 1.2;
+  margin-bottom: 8px;
+  color: #111;
+}
+
+.instructor {
+  font-size: 14px;
+  font-weight: 700;
+  margin-top: 6px;
+  color: #444;
+  display: inline-block;
+}
+
+.course-desc {
+  font-size: 13px;
+  margin-top: 10px;
+  max-width: 480px;
+  line-height: 1.7;
+  color: #555;
+}
+
+/* RIGHT */
+.course-header-right {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+/* BANNER */
+.course-banner {
+  width: 180px;
+  height: 100px;
+  border: 2px solid #222;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  box-shadow: 4px 4px 0 #222;
+}
+
+/* BUTTON */
+.course-btn {
+  border: 2px solid #222;
+  border-radius: 10px;
+  padding: 9px 18px;
+  font-weight: 800;
+  cursor: pointer;
+  background: #fff;
+  font-size: 13px;
+  box-shadow: 4px 4px 0 #222;
+  transition: 0.18s;
+}
+
+.course-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 #222;
+  background: #111;
+  color: #fff;
+}
+
+/* GRID */
+.feature-grid {
+    width: 70vw;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 70px;
+  margin-bottom: 40px;
+}
+
+/* CARD */
+.feature-card {
+  border: 2px solid #222;
+  border-radius: 14px;
+  width: 100%;
+  padding: 0;
+  background: #fff;
+  box-shadow: 5px 5px 0 #222;
+  cursor: pointer;
+  transition: 0.2s;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.feature-card:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 7px 7px 0 #222;
+}
+
+/* IMAGE AREA */
+.feature-image {
+  width: 100%;
+  height: auto;
+  min-height: 180px;
+  border: none;
+  border-bottom: 2px solid #222;
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  margin-bottom: 0;
+  background: #f7f7f7;
+  overflow: hidden;
+}
+
+.feature-image img {
+  width: 100%;
+  height: auto;
+  max-height: 240px;
+  object-fit: contain;
+  display: block;
+}
+
+/* CARD TEXT AREA */
+.feature-card h3 {
+  font-size: 16px;
+  font-weight: 900;
+  padding: 14px 18px 4px 18px;
+  margin: 0;
+  color: #111;
+}
+
+.feature-card p {
+  font-size: 13px;
+  margin: 0;
+  padding: 6px 18px 16px 18px;
+  line-height: 1.5;
+  color: #666;
+}
+
+/* ACTIVITY */
+.activity-section {
+    width: 70vw;
+  margin-top: 0;
+  border: 2px solid #222;
+  border-radius: 14px;
+  padding: 24px 28px;
+  box-shadow: 5px 5px 0 #222;
+  background: #fff;
+}
+
+.activity-section h3 {
+  font-weight: 900;
+  margin-bottom: 60px;
+  font-size: 18px;
+  color: #111;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #222;
+}
+
+.activity-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  margin-bottom: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 35px;
+}
+
+.activity-section li {
+  font-size: 13px;
+  padding: 10px 14px;
+  border: 2px solid #222;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  background: #fafafa;
+  transition: 0.18s;
+  color: #333;
+  box-shadow: 3px 3px 0 #222;
+}
+
+.activity-section li::before {
+  content: "→";
+  font-size: 13px;
+  font-weight: 700;
+  color: #888;
+}
+
+.activity-section li:hover {
+  background: #111;
+  color: #fff;
+  border-color: #111;
+  box-shadow: 3px 3px 0 #ccc;
+  transform: translate(-2px, -2px);
+}
+
+.activity-section li:hover::before {
+  color: #fff;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .course-detail {
+    padding: 20px 16px;
+  }
+
+  .course-header {
+    flex-direction: column;
+  }
+
+  .feature-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .course-header-left h1 {
+    font-size: 22px;
+  }
+}

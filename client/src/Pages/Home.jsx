@@ -20,10 +20,20 @@ const Home = () => {
   }, [handleRoomJoined, socket])
 
   const handleJoinRoom = () => {
-    localStorage.setItem("webrtc-email", email);
-    localStorage.setItem("webrtc-room-id", roomId);
-    socket.emit('join-room', { emailId: email, roomId })
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    alert("Please login first");
+    return;
   }
+
+  localStorage.setItem("webrtc-room-id", roomId);
+
+  socket.emit('join-room', {
+    roomId,
+    token // ✅ SEND JWT
+  });
+};
 
   return (
     <div className="home-root">

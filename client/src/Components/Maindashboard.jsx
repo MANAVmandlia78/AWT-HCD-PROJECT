@@ -17,6 +17,42 @@ const Maindashboard = () => {
       title: "SEO Training",
       image: "/sketch-4.png",
     },
+    {
+      title: "Database Management System",
+      image: "/sketch-1.png",
+    },
+    {
+      title: "SQL Crash Course",
+      image: "/sketch-3.png",
+    },
+    {
+      title: "SEO Training",
+      image: "/sketch-4.png",
+    },
+    {
+      title: "Database Management System",
+      image: "/sketch-1.png",
+    },
+    {
+      title: "SQL Crash Course",
+      image: "/sketch-3.png",
+    },
+    {
+      title: "SEO Training",
+      image: "/sketch-4.png",
+    },
+    {
+      title: "Database Management System",
+      image: "/sketch-1.png",
+    },
+    {
+      title: "SQL Crash Course",
+      image: "/sketch-3.png",
+    },
+    {
+      title: "SEO Training",
+      image: "/sketch-4.png",
+    },
     // {
     //   title: "Computer Network",
     //   image: "/sketch-2.png",

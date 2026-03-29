@@ -13,7 +13,7 @@ const rtcConfig = {
 const Room = () => {
   const socket = useSocket();
   const { roomId } = useParams();
-  const myEmail = useMemo(() => localStorage.getItem("webrtc-email") || "", []);
+  // const myEmail = useMemo(() => localStorage.getItem("webrtc-email") || "", []);
 
   const [participants, setParticipants] = useState([]);
   const [currentSharer, setCurrentSharer] = useState(null); // {socketId, emailId}
@@ -124,7 +124,7 @@ const Room = () => {
   const startScreenShare = useCallback(async () => {
     if (!socket?.id) return;
     if (currentSharer && currentSharer.socketId !== socket.id) {
-      setNotice(`${currentSharer.emailId || "Another user"} is already sharing.`);
+      setNotice(`Another user is already sharing.`);
       return;
     }
 
@@ -148,9 +148,11 @@ const Room = () => {
 
   useEffect(() => {
     if (!socket || !roomId) return;
-    if (myEmail) {
-      socket.emit("join-room", { roomId, emailId: myEmail });
-    }
+    const token = localStorage.getItem("token");
+
+if (token) {
+  socket.emit("join-room", { roomId, token });
+}
     socket.emit("get-room-state");
   }, [myEmail, roomId, socket]);
 
@@ -187,7 +189,7 @@ const Room = () => {
     };
 
     const handleScreenShareStarted = async ({ sharerSocketId, sharerEmail }) => {
-      setCurrentSharer({ socketId: sharerSocketId, emailId: sharerEmail });
+      setCurrentSharer({ socketId: sharerSocketId, userId: sharerEmail });
       setNotice("");
 
       if (socket.id === sharerSocketId) {
@@ -202,7 +204,7 @@ const Room = () => {
     };
 
     const handleScreenShareDenied = ({ sharerEmail }) => {
-      setNotice(`${sharerEmail || "Another user"} is already sharing.`);
+      setNotice(`Another user is already sharing.`);
       if (myStreamRef.current) {
         myStreamRef.current.getTracks().forEach((t) => t.stop());
       }
@@ -309,7 +311,7 @@ const Room = () => {
           {currentSharer ? (
             <span className="status-badge connected">
               <span className="status-dot" />
-              Sharing: {currentSharer.emailId}
+              Sharing: {currentSharer.userId}
             </span>
           ) : (
             <span className="status-badge waiting">
@@ -327,7 +329,7 @@ const Room = () => {
           </button>
         ) : (
           <span className="status-badge waiting">
-            Viewing {currentSharer?.emailId}
+            Viewing {currentSharer?.userId}
           </span>
         )}
       </header>
@@ -339,7 +341,7 @@ const Room = () => {
           <div className={`video-card ${!singleScreenStream ? "empty" : ""}`}>
             <div className="video-label">
               {currentSharer
-                ? `${currentSharer.emailId}'s Screen`
+                ? `${currentSharer.userId}'s Screen`
                 : "Live Screen"}
             </div>
             {singleScreenStream ? (

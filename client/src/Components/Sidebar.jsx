@@ -7,7 +7,8 @@ import { MdNotificationsActive } from "react-icons/md";
 import { IoPersonCircleOutline } from "react-icons/io5";
 import { MdOutlineSettings } from "react-icons/md";
 import { CiLogout } from "react-icons/ci";
-
+import logo from '../assets/ChatGPT Image Mar 22, 2026, 05_17_10 PM.png'
+import logo2 from "../assets/ChatGPT Image Mar 26, 2026, 07_15_12 PM.png"
 const Sidebar = () => {
   const [active, setActive] = useState("Courses");
 
@@ -15,6 +16,7 @@ const Sidebar = () => {
     { name: "Dashboard", icon: <TfiDashboard /> },
     { name: "Courses", icon: <FaBook /> },
     { name: "Calendar", icon: <FaRegCalendarAlt /> },
+    { name: "LiveClasses", icon: <FaRegCalendarAlt /> },
     { name: "Announcements", icon: <MdNotificationsActive />, badge: 3 },
   ];
 
@@ -30,13 +32,9 @@ const Sidebar = () => {
       {/* LOGO */}
       <div className="sidebar-logo">
         <div className="logo-wrap">
-          <div className="logo-icon">CC</div>
           <span className="logo-text">Class Connect</span>
         </div>
       </div>
-
-      {/* MAIN */}
-      <div className="nav-section-label">MAIN</div>
 
       {menuItems.map((item) => (
         <div

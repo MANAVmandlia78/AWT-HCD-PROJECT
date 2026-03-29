@@ -32,7 +32,7 @@ const CourseCard = ({ course }) => {
         style={{
           width: "100%",
           height: "200px",
-          objectFit: "cover",
+          objectFit: "contain",
           border: "3px solid #000",
           borderRadius: "8px",
         }}

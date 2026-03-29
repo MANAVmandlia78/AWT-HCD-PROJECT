@@ -8,7 +8,6 @@ export const useSocket = () => {
 }
 
 export const SocketProvider = (props) => {
-  // ❌ Original localhost version
   const socket = useMemo(() => io('http://localhost:8000'), [])
 
   return (
