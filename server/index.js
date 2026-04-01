@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+require("dotenv").config();
 const { Server } = require('socket.io');
 const jwt = require("jsonwebtoken"); // ✅ NEW
 const db = require("./config/db");
@@ -7,7 +8,7 @@ const io = new Server({ cors: true });
 const cors = require("cors");
 const app = express();
 const authRoutes = require("./routes/authRoutes");
-require("dotenv").config();
+
 app.use(cors({
   origin: "http://localhost:5173",
   credentials: true
@@ -15,6 +16,240 @@ app.use(cors({
 app.use(express.json());
 app.use(bodyParser.json());
 app.use("/api/auth", authRoutes);
+app.get("/api/assignments", (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) return res.status(401).json({ message: "No token" });
+
+    const user = jwt.verify(token, process.env.JWT_SECRET);
+
+    // 🔥 Only students (optional but recommended)
+    if (user.role !== "student" && user.role !== "teacher") {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    const query = `
+      SELECT assignments.*, users.name AS teacher_name
+      FROM assignments
+      JOIN users ON assignments.teacher_id = users.id
+      WHERE assignments.department_id = ?
+      ORDER BY assignments.created_at DESC
+    `;
+
+    db.query(query, [user.department_id], (err, result) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).json(err);
+      }
+
+      res.json(result);
+    });
+
+  } catch (err) {
+    console.log(err);
+    res.status(401).json({ message: "Invalid token" });
+  }
+});
+app.post("/api/submissions", async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) return res.status(401).json({ message: "No token" });
+
+    const user = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (user.role !== "student") {
+      return res.status(403).json({ message: "Only students can submit" });
+    }
+
+    const { assignment_id, file_url } = req.body;
+
+    if (!assignment_id || !file_url) {
+      return res.status(400).json({ message: "Assignment ID and file URL required" });
+    }
+
+    const query = `
+      INSERT INTO submissions (assignment_id, student_id, file_url)
+      VALUES (?, ?, ?)
+    `;
+
+    db.query(
+      query,
+      [assignment_id, user.id, file_url],
+      (err, data) => {
+        if (err) {
+          if (err.code === "ER_DUP_ENTRY") {
+            return res.status(400).json({
+              message: "You already submitted this assignment",
+            });
+          }
+
+          return res.status(500).json(err);
+        }
+
+        res.json({
+          message: "Assignment submitted successfully",
+          fileUrl: file_url,
+        });
+      }
+    );
+
+  } catch (err) {
+    console.log(err);
+    res.status(401).json({ message: "Invalid token" });
+  }
+});
+app.put("/api/submissions/:id", (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) return res.status(401).json({ message: "No token" });
+
+    const user = jwt.verify(token, process.env.JWT_SECRET);
+
+    // ✅ Only teacher allowed
+    if (user.role !== "teacher") {
+      return res.status(403).json({ message: "Only teachers can grade" });
+    }
+
+    const submissionId = req.params.id;
+    const { grade, feedback } = req.body;
+
+    const query = `
+      UPDATE submissions
+      SET grade = ?, feedback = ?
+      WHERE id = ?
+    `;
+
+    db.query(query, [grade, feedback, submissionId], (err, result) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).json(err);
+      }
+
+      res.json({
+        message: "Submission graded successfully",
+      });
+    });
+
+  } catch (err) {
+    console.log(err);
+    res.status(401).json({ message: "Invalid token" });
+  }
+});
+const path = require("path");
+app.get("/api/submissions/:id", (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) return res.status(401).json({ message: "No token" });
+
+    const user = jwt.verify(token, process.env.JWT_SECRET);
+
+    const assignmentId = req.params.id;
+
+    console.log("Fetching submissions for:", assignmentId); // 🔥 debug
+
+    const query = `
+      SELECT 
+        submissions.*, 
+        users.name AS student_name, 
+        users.enrollment_no
+      FROM submissions
+      JOIN users ON submissions.student_id = users.id
+      WHERE submissions.assignment_id = ?
+    `;
+
+    db.query(query, [assignmentId], (err, result) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).json(err);
+      }
+
+      console.log("RESULT:", result); // 🔥 debug
+
+      res.json(result);
+    });
+
+  } catch (err) {
+    console.log(err);
+    res.status(401).json({ message: "Invalid token" });
+  }
+});
+
+app.post("/api/assignments", async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) return res.status(401).json({ message: "No token" });
+
+    const user = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (user.role !== "teacher") {
+      return res.status(403).json({ message: "Only teachers can create assignments" });
+    }
+
+    const { title, description, due_date, file_url } = req.body;
+
+    if (!title || !file_url) {
+      return res.status(400).json({ message: "Title and file required" });
+    }
+
+    const query = `
+      INSERT INTO assignments (title, description, file_url, teacher_id, department_id, due_date)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `;
+
+    db.query(
+      query,
+      [title, description, file_url, user.id, user.department_id, due_date],
+      (err, result) => {
+        if (err) return res.status(500).json(err);
+
+        res.json({
+          message: "Assignment created successfully",
+          assignmentId: result.insertId,
+          fileUrl: file_url,
+        });
+      }
+    );
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Failed to create assignment" });
+  }
+});
+app.get("/api/auth/me", (req, res) => {
+  const token = req.headers.authorization?.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).json({ message: "No token provided" });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const query = `
+      SELECT users.id, users.name, users.email, users.role,
+             users.enrollment_no,  -- ✅ ADD THIS
+             users.gender, 
+             colleges.name AS college,
+             departments.name AS department
+      FROM users
+      LEFT JOIN colleges ON users.college_id = colleges.id
+      LEFT JOIN departments ON users.department_id = departments.id
+      WHERE users.id = ?
+    `;
+
+    db.query(query, [decoded.id], (err, result) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).json(err);
+      }
+
+      res.json(result[0]);
+    });
+
+  } catch (err) {
+    return res.status(401).json({ message: "Invalid token" });
+  }
+});
 
 // 🔥 UPDATED MAPS
 const socketToUserMapping = new Map(); // socketId -> userId

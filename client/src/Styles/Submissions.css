@@ -1,0 +1,209 @@
+/* ─────────────────────────────────────────
+   SUBMISSIONS — brutalist stylesheet
+   ───────────────────────────────────────── */
+
+/* CONTAINER */
+.submissions-container {
+  margin-left: var(--sidebar-width, 240px);
+  padding: 28px 24px;
+  background: #fff;
+  min-height: 100vh;
+  font-family: "Syne", "Space Grotesk", sans-serif;
+}
+
+/* PAGE TITLE */
+.submissions-container .title {
+  font-size: 24px;
+  font-weight: 900;
+  margin-bottom: 28px;
+  letter-spacing: -0.5px;
+  text-transform: uppercase;
+}
+
+/* ─── SUBMISSIONS LIST SECTION ─── */
+.submissions-list-section {
+  border: 2px solid #000;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.submissions-list-section .section-header {
+  padding: 10px 16px;
+  border-bottom: 2px solid #000;
+  font-size: 14px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  background: #000;
+  color: #fff;
+}
+
+/* ─── SUBMISSION ROW ─── */
+.submission-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 22px 24px;
+  margin: 20px;
+  border: 1px solid #000;
+  border-radius: 8px;
+  box-shadow: 4px 4px 0 #000;
+  transition: box-shadow 0.2s ease, transform 0.2s ease, background 0.2s ease;
+}
+
+.submission-row:hover {
+  background: #f5f5f5;
+  transform: translate(-1px, -1px);
+  box-shadow: 6px 6px 0 #000;
+}
+
+/* INFO */
+.submission-info h4 {
+  font-size: 15px;
+  font-weight: 800;
+  margin: 0 0 4px;
+}
+
+.submission-info p {
+  font-size: 12px;
+  color: #444;
+  margin: 0 0 2px;
+}
+
+.submission-info .grade-badge {
+  display: inline-block;
+  margin-top: 6px;
+  border: 2px solid #000;
+  border-radius: 6px;
+  padding: 2px 10px;
+  font-size: 11px;
+  font-weight: 900;
+  background: #000;
+  color: #fff;
+  letter-spacing: 0.3px;
+}
+
+/* ACTIONS */
+.submission-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-end;
+  flex-shrink: 0;
+  min-width: 200px;
+}
+
+/* VIEW LINK */
+.submission-actions a {
+  border: 2px solid #000;
+  border-radius: 6px;
+  padding: 5px 12px;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 800;
+  color: #000;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.submission-actions a:hover {
+  box-shadow: 3px 3px 0 #000;
+  transform: translate(-1px, -1px);
+}
+
+/* GRADE INPUT ROW */
+.grade-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.grade-row input {
+  border: 2px solid #000;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+  width: 80px;
+  outline: none;
+  transition: box-shadow 0.15s ease;
+}
+
+.grade-row input:focus {
+  box-shadow: 3px 3px 0 #000;
+}
+
+.grade-row textarea {
+  border: 2px solid #000;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  width: 160px;
+  height: 36px;
+  resize: none;
+  outline: none;
+  transition: box-shadow 0.15s ease;
+}
+
+.grade-row textarea:focus {
+  box-shadow: 3px 3px 0 #000;
+}
+
+/* GRADE BUTTON */
+.btn-grade {
+  border: 2px solid #000;
+  border-radius: 6px;
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 900;
+  background: #000;
+  color: #fff;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.btn-grade:hover {
+  box-shadow: 3px 3px 0 #555;
+  transform: translate(-1px, -1px);
+}
+
+.btn-grade:active {
+  transform: translate(0, 0);
+  box-shadow: none;
+}
+
+/* EMPTY STATE */
+.empty-state {
+  padding: 28px 24px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #888;
+  text-align: center;
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 700px) {
+  .submission-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .submission-actions {
+    align-items: flex-start;
+    min-width: unset;
+    width: 100%;
+  }
+
+  .grade-row {
+    flex-wrap: wrap;
+  }
+
+  .grade-row textarea {
+    width: 100%;
+  }
+}

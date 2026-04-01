@@ -1,30 +1,86 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
+
 import Home from "./Pages/Home";
-import LandingPage from "./Pages/LandingPage";
 import Room from "./Pages/Room";
-import { SocketProvider } from "./Providers/Socket";
-import { PeerProvider } from "./Providers/Peer";
 import LMSmain from "./Pages/LMSmain";
 import Login from "./Pages/Login";
 import Signup from "./Pages/Signup";
+import Submissions from "./Pages/Submissions"; // 🔥 ADD THIS
+import { SocketProvider } from "./Providers/Socket";
+import { PeerProvider } from "./Providers/Peer";
+
+import ProtectedRoute from "./components/ProtectedRoute";
+import PublicRoute from "./components/PublicRoute";
+
 const App = () => {
   return (
-    <div>
-      <SocketProvider>
-        <PeerProvider>
-          <Routes>
-            {/* <Route path="/" element={<LandingPage></LandingPage>}></Route> */}
-            <Route path="/" element={<LMSmain></LMSmain>}></Route>
-            <Route path="/home" element={<Home></Home>}></Route>
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/dashboard" element={<LMSmain></LMSmain>}></Route> 
-            <Route path="/room/:roomId" element={<Room></Room>}></Route>
-          </Routes>
-        </PeerProvider>
-      </SocketProvider>
-    </div>
+    <SocketProvider>
+      <PeerProvider>
+        <Routes>
+
+          {/* PUBLIC */}
+          <Route
+            path="/login"
+            element={
+              <PublicRoute>
+                <Login />
+              </PublicRoute>
+            }
+          />
+
+          <Route
+            path="/signup"
+            element={
+              <PublicRoute>
+                <Signup />
+              </PublicRoute>
+            }
+          />
+
+          <Route
+  path="/submissions/:id"
+  element={
+    <ProtectedRoute>
+      <Submissions />
+    </ProtectedRoute>
+  }
+/>
+
+          {/* PROTECTED */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <LMSmain />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/home"
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/room/:roomId"
+            element={
+              <ProtectedRoute>
+                <Room />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* DEFAULT */}
+          <Route path="/" element={<Navigate to="/login" />} />
+
+        </Routes>
+      </PeerProvider>
+    </SocketProvider>
   );
 };
 

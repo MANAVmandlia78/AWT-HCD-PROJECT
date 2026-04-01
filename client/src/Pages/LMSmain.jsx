@@ -6,14 +6,20 @@ import Profile from "../Pages/ProfilePage"
 import React from 'react'
 import Calendar from '../Components/Calendar'
 import CourseDetail from '../Pages/CourseDetail'
+import Assignments from './Assignments'
+import Submissions from './Submissions'
+import TeacherAssignments from './TeacherAssignments'
 
 const LMSmain = () => {
   return (
     <div className="lms-layout">
         <Sidebar></Sidebar>
-        <Maindashboard></Maindashboard>
-        {/* <CourseDetail></CourseDetail>
-        <Profile></Profile> */}
+        {/* <Maindashboard></Maindashboard> */}
+        {/* <CourseDetail></CourseDetail> */}
+        {/* <Profile></Profile> */}
+        <Assignments></Assignments>
+        {/* <Submissions></Submissions> */}
+        {/* <TeacherAssignments></TeacherAssignments> */}
         {/* <Calendar></Calendar> */}
     </div>
   )

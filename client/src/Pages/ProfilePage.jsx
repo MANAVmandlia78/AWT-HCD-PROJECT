@@ -1,14 +1,17 @@
 import React from "react";
 import "../Styles/profile.css";
-import profile from "/profile-pic-man.png";
+import profileMan from "/profile-pic-man.png";
+import profileWoman from "/profile-pic-women.png";
+import { useAuth } from "../context/AuthContext";
 
 const Profile = () => {
-  const user = {
-    name: "Manav Mandalia",
-    department: "Information and Communication Technology",
-    enrollment: "92301733067",
-    email: "manavmandalia077@gmail.com",
-  };
+  const { user } = useAuth();
+
+  if (!user) return <div>Loading...</div>;
+
+  // 🔥 dynamic image
+  const profileImage =
+    user?.gender === "female" ? profileWoman : profileMan;
 
   return (
     <div className="profile-container">
@@ -16,14 +19,11 @@ const Profile = () => {
 
         {/* TOP BAR */}
         <div className="profile-topbar">
-          <span className="profile-label">Student Profile</span>
-          <button className="edit-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-            </svg>
-            Edit Profile
-          </button>
+          <span className="profile-label">
+            {user.role?.toUpperCase()} Profile
+          </span>
+
+          <button className="edit-btn">Edit Profile</button>
         </div>
 
         <div className="profile-body">
@@ -31,11 +31,18 @@ const Profile = () => {
           {/* LEFT */}
           <div className="profile-left">
             <div className="avatar-wrapper">
-              <img src={profile} alt="profile" />
-              <div className="avatar-badge">ICT</div>
+              <img src={profileImage} alt="profile" />
+
+              <div className="avatar-badge">
+                {user.department?.slice(0, 3)?.toUpperCase()}
+              </div>
             </div>
+
             <h2 className="profile-name">{user.name}</h2>
-            <span className="profile-dept-tag">{user.department}</span>
+
+            <span className="profile-dept-tag">
+              {user.department}
+            </span>
           </div>
 
           {/* DIVIDER */}
@@ -46,6 +53,7 @@ const Profile = () => {
             <p className="section-heading">Account Details</p>
 
             <div className="profile-info">
+
               <div className="info-row">
                 <span className="info-label">Department</span>
                 <p className="info-value">{user.department}</p>
@@ -53,13 +61,28 @@ const Profile = () => {
 
               <div className="info-row">
                 <span className="info-label">Enrollment No.</span>
-                <p className="info-value">{user.enrollment}</p>
+                <p className="info-value">
+                  {user.enrollment_no || "N/A"}
+                </p>
               </div>
 
               <div className="info-row">
                 <span className="info-label">Email Address</span>
                 <p className="info-value">{user.email}</p>
               </div>
+
+              <div className="info-row">
+                <span className="info-label">College</span>
+                <p className="info-value">{user.college}</p>
+              </div>
+
+              <div className="info-row">
+                <span className="info-label">Role</span>
+                <p className="info-value">
+                  {user.role?.toUpperCase()}
+                </p>
+              </div>
+
             </div>
           </div>
 

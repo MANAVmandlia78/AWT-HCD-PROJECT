@@ -1,0 +1,264 @@
+/* ─────────────────────────────────────────
+   TEACHER ASSIGNMENTS — brutalist stylesheet
+   ───────────────────────────────────────── */
+
+/* CONTAINER */
+.teacher-assignments-container {
+    margin-right: 50px;
+    margin-left: var(--sidebar-width);
+  padding: 28px 24px;
+  background: #fff;
+  min-height: 100vh;
+  width: 100%;
+  font-family: "Syne", "Space Grotesk", sans-serif;
+}
+
+/* PAGE TITLE */
+.teacher-assignments-container .title {
+  font-size: 24px;
+  font-weight: 900;
+  margin-bottom: 28px;
+  letter-spacing: -0.5px;
+  text-transform: uppercase;
+}
+
+/* ─── CREATE FORM CARD ─── */
+.create-assignment-card {
+  border: 2px solid #000;
+  border-radius: 10px;
+  margin-bottom: 40px;
+  overflow: hidden;
+}
+
+.create-assignment-card .card-header {
+  padding: 10px 16px;
+  border-bottom: 2px solid #000;
+  font-size: 14px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  background: #000;
+  color: #fff;
+}
+
+.create-assignment-card .card-body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* FORM INPUTS */
+.create-assignment-card input[type="text"],
+.create-assignment-card textarea {
+  width: 100%;
+  border: 2px solid #000;
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  outline: none;
+  box-sizing: border-box;
+  transition: box-shadow 0.15s ease;
+  background: #fff;
+}
+
+.create-assignment-card input[type="text"]:focus,
+.create-assignment-card textarea:focus {
+  box-shadow: 4px 4px 0 #000;
+}
+
+.create-assignment-card textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+
+/* FILE INPUT ROW */
+.file-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.file-input-label {
+  display: inline-block;
+  border: 2px solid #000;
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+  background: #fff;
+  white-space: nowrap;
+}
+
+.file-input-label:hover {
+  box-shadow: 3px 3px 0 #000;
+  transform: translate(-1px, -1px);
+}
+
+.file-input-label input[type="file"] {
+  display: none;
+}
+
+.file-name-display {
+  font-size: 12px;
+  font-weight: 600;
+  color: #555;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 260px;
+}
+
+/* SUBMIT BUTTON */
+.btn-create {
+  align-self: flex-start;
+  border: 2px solid #000;
+  border-radius: 6px;
+  padding: 8px 20px;
+  font-size: 13px;
+  font-weight: 900;
+  background: #000;
+  color: #fff;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.btn-create:hover {
+  background: #111;
+  box-shadow: 4px 4px 0 #555;
+  transform: translate(-1px, -1px);
+}
+
+.btn-create:active {
+  transform: translate(0, 0);
+  box-shadow: none;
+}
+
+/* ─── ASSIGNMENTS LIST SECTION ─── */
+.assignments-list-section {
+  border: 2px solid #000;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.assignments-list-section .section-header {
+  padding: 10px 16px;
+  border-bottom: 2px solid #000;
+  font-size: 14px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+/* ASSIGNMENT ROW */
+.teacher-assignment-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 22px 24px;
+  margin: 30px;
+  border: 1px solid #000;
+  border-radius: 8px;
+  box-shadow: 4px 4px 0 #000;
+  transition: box-shadow 0.2s ease, transform 0.2s ease, background 0.2s ease;
+}
+
+.teacher-assignment-row:hover {
+  background: #f5f5f5;
+  transform: translate(-1px, -1px);
+  box-shadow: 6px 6px 0 #000;
+}
+
+/* ROW INFO */
+.teacher-assignment-info h4 {
+  font-size: 15px;
+  font-weight: 800;
+  margin: 0 0 4px;
+}
+
+.teacher-assignment-info p {
+  font-size: 12px;
+  color: #444;
+  margin: 0;
+}
+
+/* ROW ACTIONS */
+.teacher-assignment-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* VIEW LINK */
+.teacher-assignment-actions a {
+  border: 2px solid #000;
+  border-radius: 6px;
+  padding: 5px 12px;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 800;
+  color: #000;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.teacher-assignment-actions a:hover {
+  box-shadow: 3px 3px 0 #000;
+  transform: translate(-1px, -1px);
+}
+
+/* VIEW SUBMISSIONS BUTTON */
+.btn-submissions {
+  border: 2px solid #000;
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 800;
+  background: #000;
+  color: #fff;
+  cursor: pointer;
+  font-family: inherit;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.btn-submissions:hover {
+  box-shadow: 3px 3px 0 #555;
+  transform: translate(-1px, -1px);
+}
+
+.btn-submissions:active {
+  transform: translate(0, 0);
+  box-shadow: none;
+}
+
+/* EMPTY STATE */
+.empty-state {
+  padding: 28px 24px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #888;
+  text-align: center;
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 700px) {
+  .teacher-assignment-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .teacher-assignment-actions {
+    flex-wrap: wrap;
+  }
+
+  .file-input-wrapper {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

@@ -7,10 +7,12 @@ import { MdNotificationsActive } from "react-icons/md";
 import { IoPersonCircleOutline } from "react-icons/io5";
 import { MdOutlineSettings } from "react-icons/md";
 import { CiLogout } from "react-icons/ci";
-import logo from '../assets/ChatGPT Image Mar 22, 2026, 05_17_10 PM.png'
-import logo2 from "../assets/ChatGPT Image Mar 26, 2026, 07_15_12 PM.png"
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 const Sidebar = () => {
   const [active, setActive] = useState("Courses");
+  const navigate = useNavigate();
+   const { user } = useAuth();
 
   const menuItems = [
     { name: "Dashboard", icon: <TfiDashboard /> },
@@ -26,6 +28,19 @@ const Sidebar = () => {
     { name: "Logout", icon: <CiLogout /> },
   ];
 
+  const logout = () => {
+    localStorage.removeItem("token");
+    navigate("/login"); // better than window.location.href
+  };
+
+  const handleClick = (item) => {
+    if (item.name === "Logout") {
+      logout();
+    } else {
+      setActive(item.name);
+    }
+  };
+
   return (
     <aside className="sidebar">
 
@@ -36,6 +51,7 @@ const Sidebar = () => {
         </div>
       </div>
 
+      {/* MAIN MENU */}
       {menuItems.map((item) => (
         <div
           key={item.name}
@@ -55,7 +71,7 @@ const Sidebar = () => {
         <div
           key={item.name}
           className={`nav-item ${active === item.name ? "active" : ""}`}
-          onClick={() => setActive(item.name)}
+          onClick={() => handleClick(item)}
         >
           <span className="nav-icon">{item.icon}</span>
           <span>{item.name}</span>
@@ -65,10 +81,17 @@ const Sidebar = () => {
       {/* USER */}
       <div className="sidebar-bottom">
         <div className="user-mini">
-          <div className="user-avatar-sm">SH</div>
+          <div className="user-avatar-sm">
+  {user?.name
+    ?.split(" ")
+    .map((word) => word[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase()}
+</div>
           <div className="user-mini-info">
-            <div className="user-mini-name">SALMAN H.</div>
-            <div className="user-mini-role">INSTRUCTOR</div>
+            <div className="user-mini-name">{user?.name}</div>
+            <div className="user-mini-role">{user?.role?.toUpperCase()}</div>
           </div>
         </div>
       </div>

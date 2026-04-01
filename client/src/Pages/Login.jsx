@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext"; // ✅ ADD THIS
 
 const Login = () => {
   const navigate = useNavigate();
+  const { login } = useAuth(); // ✅ from context
 
   const [form, setForm] = useState({
     email: "",
@@ -16,17 +18,18 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
-      const res = await axios.post("http://localhost:8000/api/auth/login", form);
+      const res = await axios.post(
+        "http://localhost:8000/api/auth/login",
+        form
+      );
 
-      // ✅ store token
-      localStorage.setItem("token", res.data.token);
+      // ✅ ONLY PASS TOKEN
+      login(res.data.token);
 
-      const role = res.data.user.role;
+      // ❌ REMOVE manual localStorage (context handles it)
 
-      // ✅ redirect based on role
-      if (role === "student") navigate("/dashboard");
-      else if (role === "teacher") navigate("/dashboard");
-      else if (role === "admin") navigate("/admin");
+      // ✅ redirect
+      navigate("/dashboard");
 
     } catch (err) {
       alert(err.response?.data?.message || "Login failed");
@@ -36,7 +39,6 @@ const Login = () => {
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-
         <h2>Login</h2>
 
         <input
@@ -67,7 +69,6 @@ const Login = () => {
             Signup
           </span>
         </p>
-
       </div>
     </div>
   );
@@ -75,7 +76,7 @@ const Login = () => {
 
 export default Login;
 
-// 🔥 minimal brutalism style
+// styles (same as yours)
 const styles = {
   container: {
     height: "100vh",

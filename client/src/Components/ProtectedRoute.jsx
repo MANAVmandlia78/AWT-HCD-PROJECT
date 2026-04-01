@@ -1,19 +1,16 @@
 import { Navigate } from "react-router-dom";
 import { getUser } from "../utils/auth";
 
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = ({ children, allowedRoles }) => {
   const user = getUser();
 
-  const logout = () => {
-  localStorage.removeItem("token");
-  window.location.href = "/login";
-};
-
+  // ❌ Not logged in → redirect
   if (!user) {
     return <Navigate to="/login" />;
   }
 
-   if (allowedRoles && !allowedRoles.includes(user.role)) {
+  // ✅ Role-based protection (optional)
+  if (allowedRoles && !allowedRoles.includes(user.role)) {
     return <Navigate to="/unauthorized" />;
   }
 
