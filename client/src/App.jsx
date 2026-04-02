@@ -9,7 +9,8 @@ import Signup from "./Pages/Signup";
 import Submissions from "./Pages/Submissions"; // 🔥 ADD THIS
 import { SocketProvider } from "./Providers/Socket";
 import { PeerProvider } from "./Providers/Peer";
-
+import StudentQuiz from './Pages/StudentQuiz'
+import QuizList from "./Pages/QuizList";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
 
@@ -28,6 +29,15 @@ const App = () => {
               </PublicRoute>
             }
           />
+
+          <Route
+  path="/quizzes"
+  element={
+    <ProtectedRoute>
+      <QuizList />
+    </ProtectedRoute>
+  }
+/>
 
           <Route
             path="/signup"
@@ -65,6 +75,15 @@ const App = () => {
               </ProtectedRoute>
             }
           />
+
+          <Route
+  path="/quiz/:id"
+  element={
+    <ProtectedRoute>
+      <StudentQuiz />
+    </ProtectedRoute>
+  }
+/>
 
           <Route
             path="/room/:roomId"

@@ -174,6 +174,203 @@ app.get("/api/submissions/:id", (req, res) => {
   }
 });
 
+app.post("/api/quizzes", async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) return res.status(401).json({ message: "No token" });
+
+    const user = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (user.role !== "teacher") {
+      return res.status(403).json({ message: "Only teachers can create quiz" });
+    }
+
+    const { title, questions } = req.body;
+
+    if (!title || !questions || questions.length < 10) {
+      return res.status(400).json({ message: "Invalid data" });
+    }
+
+    // 🔥 Insert quiz
+    const quizQuery = `
+      INSERT INTO quizzes (title, teacher_id, total_questions)
+      VALUES (?, ?, ?)
+    `;
+
+    db.query(
+      quizQuery,
+      [title, user.id, questions.length],
+      (err, quizResult) => {
+        if (err) return res.status(500).json(err);
+
+        const quizId = quizResult.insertId;
+
+        // 🔥 Prepare bulk insert for questions
+        const questionValues = questions.map((q) => [
+          quizId,
+          q.question,
+          q.optionA,
+          q.optionB,
+          q.optionC,
+          q.optionD,
+          q.correct,
+        ]);
+
+        const questionQuery = `
+          INSERT INTO questions
+          (quiz_id, question_text, option_a, option_b, option_c, option_d, correct_option)
+          VALUES ?
+        `;
+
+        db.query(questionQuery, [questionValues], (err2) => {
+          if (err2) return res.status(500).json(err2);
+
+          res.json({
+            message: "Quiz created successfully",
+            quizId,
+          });
+        });
+      }
+    );
+  } catch (err) {
+    console.log(err);
+    res.status(401).json({ message: "Invalid token" });
+  }
+});
+
+app.get("/api/quizzes/:id", (req, res) => {
+  const quizId = req.params.id;
+
+  const query = `
+    SELECT 
+      id,
+      question_text,
+      option_a,
+      option_b,
+      option_c,
+      option_d
+    FROM questions
+    WHERE quiz_id = ?
+  `;
+
+  db.query(query, [quizId], (err, result) => {
+    if (err) return res.status(500).json(err);
+
+    res.json(result);
+  });
+});
+
+app.post("/api/quizzes/submit", (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) return res.status(401).json({ message: "No token" });
+
+    const user = jwt.verify(token, process.env.JWT_SECRET);
+
+    // 🔥 safer role check
+    if (user.role?.toLowerCase().trim() !== "student") {
+      return res.status(403).json({ message: "Only students can submit" });
+    }
+
+    const { quiz_id, answers } = req.body;
+
+    if (!quiz_id || !answers) {
+      return res.status(400).json({ message: "Invalid data" });
+    }
+
+    // 🔥 Get correct answers
+    const query = `
+      SELECT id, correct_option 
+      FROM questions 
+      WHERE quiz_id = ?
+    `;
+
+    db.query(query, [quiz_id], (err, questions) => {
+      if (err) {
+        console.log("FETCH ERROR:", err);
+        return res.status(500).json(err);
+      }
+
+      let score = 0;
+
+      questions.forEach((q) => {
+        if (answers[q.id] === q.correct_option) {
+          score++;
+        }
+      });
+
+      // 🔥 INSERT INTO NEW TABLE (IMPORTANT FIX)
+      const insertQuery = `
+        INSERT INTO quiz_submissions (quiz_id, student_id, score)
+        VALUES (?, ?, ?)
+      `;
+
+      db.query(insertQuery, [quiz_id, user.id, score], (err2) => {
+        if (err2) {
+          console.log("INSERT ERROR:", err2); // 🔥 debug
+          return res.status(500).json(err2);
+        }
+
+        res.json({
+          message: "Quiz submitted successfully",
+          score,
+        });
+      });
+    });
+
+  } catch (err) {
+    console.log("JWT ERROR:", err);
+    res.status(401).json({ message: "Invalid token" });
+  }
+});
+app.get("/api/quizzes", (req, res) => {
+  const query = `
+    SELECT quizzes.*, users.name AS teacher_name
+    FROM quizzes
+    JOIN users ON quizzes.teacher_id = users.id
+    ORDER BY quizzes.created_at DESC
+  `;
+
+  db.query(query, (err, result) => {
+    if (err) return res.status(500).json(err);
+
+    res.json(result);
+  });
+});
+app.get("/api/quizzes/:id/result", (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) return res.status(401).json({ message: "No token" });
+
+    const user = jwt.verify(token, process.env.JWT_SECRET);
+
+    const quizId = req.params.id;
+
+    const query = `
+      SELECT score 
+      FROM quiz_submissions
+      WHERE quiz_id = ? AND student_id = ?
+    `;
+
+    db.query(query, [quizId, user.id], (err, result) => {
+      if (err) return res.status(500).json(err);
+
+      if (result.length > 0) {
+        return res.json({
+          attempted: true,
+          score: result[0].score,
+        });
+      } else {
+        return res.json({
+          attempted: false,
+        });
+      }
+    });
+
+  } catch (err) {
+    res.status(401).json({ message: "Invalid token" });
+  }
+});
 app.post("/api/assignments", async (req, res) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import "../Styles/Submissions.css";
+import Sidebar from '../Components/Sidebar'
 
 const Submissions = () => {
   const { id } = useParams();
@@ -37,6 +38,8 @@ const Submissions = () => {
   };
 
   return (
+    <div>
+      <Sidebar></Sidebar>
     <div className="submissions-container">
       <h2 className="title">Submissions</h2>
 
@@ -92,6 +95,7 @@ const Submissions = () => {
           ))
         )}
       </div>
+    </div>
     </div>
   );
 };

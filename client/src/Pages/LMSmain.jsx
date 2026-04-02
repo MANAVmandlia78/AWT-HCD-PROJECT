@@ -9,7 +9,9 @@ import CourseDetail from '../Pages/CourseDetail'
 import Assignments from './Assignments'
 import Submissions from './Submissions'
 import TeacherAssignments from './TeacherAssignments'
-
+import TeacherQuiz from './TeacherQuiz'
+import StudentQuiz from './StudentQuiz'
+import QuizList from './QuizList'
 const LMSmain = () => {
   return (
     <div className="lms-layout">
@@ -17,8 +19,11 @@ const LMSmain = () => {
         {/* <Maindashboard></Maindashboard> */}
         {/* <CourseDetail></CourseDetail> */}
         {/* <Profile></Profile> */}
-        <Assignments></Assignments>
+        {/* <TeacherQuiz></TeacherQuiz> */}
+        {/* <StudentQuiz></StudentQuiz> */}
+        {/* <Assignments></Assignments> */}
         {/* <Submissions></Submissions> */}
+        <QuizList></QuizList>
         {/* <TeacherAssignments></TeacherAssignments> */}
         {/* <Calendar></Calendar> */}
     </div>

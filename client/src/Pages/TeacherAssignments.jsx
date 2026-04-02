@@ -13,6 +13,9 @@ const TeacherAssignments = () => {
   const [description, setDescription] = useState("");
   const [file, setFile] = useState(null);
 
+  // 🔥 NEW STATE FOR DATE
+  const [dueDate, setDueDate] = useState("");
+
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
@@ -34,20 +37,31 @@ const TeacherAssignments = () => {
         return;
       }
 
+      // 🔥 Upload to Firebase
       const storageRef = ref(storage, `assignments/${Date.now()}_${file.name}`);
       await uploadBytes(storageRef, file);
       const fileUrl = await getDownloadURL(storageRef);
 
+      // 🔥 Send due_date also
       await axios.post(
         "http://localhost:8000/api/assignments",
-        { title, description, file_url: fileUrl },
+        {
+          title,
+          description,
+          file_url: fileUrl,
+          due_date: dueDate, // ✅ NEW
+        },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       alert("Assignment created ✅");
+
+      // reset
       setTitle("");
       setDescription("");
       setFile(null);
+      setDueDate("");
+
       fetchAssignments();
     } catch (err) {
       console.log(err);
@@ -75,6 +89,13 @@ const TeacherAssignments = () => {
             placeholder="Description (optional)"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+          />
+
+          {/* 🔥 DATE PICKER */}
+          <input
+            type="date"
+            value={dueDate}
+            onChange={(e) => setDueDate(e.target.value)}
           />
 
           <div className="file-input-wrapper">
@@ -108,13 +129,22 @@ const TeacherAssignments = () => {
             <div key={a.id} className="teacher-assignment-row">
               <div className="teacher-assignment-info">
                 <h4>{a.title}</h4>
+
                 {a.description && <p>{a.description}</p>}
+
+                {/* 🔥 SHOW DUE DATE */}
+                {a.due_date && (
+                  <p className="due-date">
+                    📅 Due: {new Date(a.due_date).toLocaleDateString()}
+                  </p>
+                )}
               </div>
 
               <div className="teacher-assignment-actions">
                 <a href={a.file_url} target="_blank" rel="noreferrer">
                   📄 View
                 </a>
+
                 <button
                   className="btn-submissions"
                   onClick={() => navigate(`/submissions/${a.id}`)}

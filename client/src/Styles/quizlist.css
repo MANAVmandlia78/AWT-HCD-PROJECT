@@ -1,0 +1,184 @@
+/* ─── CONTAINER ────────────────────────────────────── */
+.quizlist-container {
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  width: 100%;
+  background: #f5f5f5;
+  padding: 40px 32px;
+}
+
+/* ─── PAGE TITLE ────────────────────────────────────── */
+.quizlist-title {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #000;
+  margin: 0 auto 28px auto;
+  display: block;
+  max-width: 960px;
+}
+
+/* ─── EMPTY STATE ───────────────────────────────────── */
+.quizlist-empty {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 48px 28px;
+  background: #fff;
+  border: 2px solid #000;
+  border-radius: 16px;
+  box-shadow: 6px 6px 0 #000;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #888;
+  text-transform: uppercase;
+}
+
+/* ─── GRID ──────────────────────────────────────────── */
+.quizlist-grid {
+  /* display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  max-width: 960px;
+  margin: 0 auto; */
+}
+
+/* ─── CARD (mirrors .profile-card / .assignment-section) */
+.quiz-card {
+  background: #fff;
+  border: 2px solid #000;
+  margin: 50px;
+  border-radius: 16px;
+  box-shadow: 6px 6px 0 #000;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.quiz-card:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 9px 9px 0 #000;
+}
+
+/* ─── CARD TOPBAR (mirrors .profile-topbar) ─────────── */
+.quiz-card-topbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 20px;
+  background: #000;
+  border-bottom: 2px solid #000;
+}
+
+.quiz-card-topbar::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #5cff8f;
+  flex-shrink: 0;
+}
+
+.quiz-card-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+/* ─── CARD BODY ─────────────────────────────────────── */
+.quiz-card-body {
+  flex: 1;
+  padding: 20px 20px 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ─── QUIZ TITLE ─────────────────────────────────────── */
+.quiz-card-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: #000;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+/* ─── INFO ROWS (mirrors .info-row) ─────────────────── */
+.quiz-info-row {
+  border: 2px solid #000;
+  border-radius: 10px;
+  padding: 10px 14px;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.quiz-info-row:hover {
+  background: #f7f7f7;
+  transform: translateX(4px);
+}
+
+/* ─── INFO LABEL (mirrors .info-label) ──────────────── */
+.quiz-info-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #888;
+  margin-bottom: 3px;
+}
+
+/* ─── INFO VALUE (mirrors .info-value) ──────────────── */
+.quiz-info-value {
+  font-size: 13px;
+  font-weight: 800;
+  color: #000;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+/* ─── CARD FOOTER ───────────────────────────────────── */
+.quiz-card-footer {
+  padding: 16px 20px 20px 20px;
+}
+
+/* ─── ATTEMPT BUTTON (mirrors .edit-btn) ────────────── */
+.quiz-attempt-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 18px;
+  background: #000;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 2px solid #000;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+
+.quiz-attempt-btn:hover {
+  background: #fff;
+  color: #000;
+  transform: translateY(-1px);
+}
+
+/* ─── RESPONSIVE ─────────────────────────────────────── */
+@media (max-width: 700px) {
+  .quizlist-container {
+    padding: 24px 16px;
+  }
+
+  .quizlist-grid {
+    grid-template-columns: 1fr;
+  }
+}

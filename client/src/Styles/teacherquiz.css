@@ -1,0 +1,297 @@
+/* ─── CONTAINER ────────────────────────────────────── */
+.teacherquiz-container {
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  width: 100%;
+  background: #f5f5f5;
+  padding: 40px 32px;
+}
+
+/* ─── PAGE TITLE ────────────────────────────────────── */
+.teacherquiz-title {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #000;
+  margin: 0 auto 28px auto;
+  display: block;
+  max-width: 960px;
+}
+
+/* ─── TOP CONFIG CARD ───────────────────────────────── */
+/* (mirrors .profile-card / .assignment-section) */
+.teacherquiz-config {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto 28px auto;
+  background: #fff;
+  border: 2px solid #000;
+  border-radius: 16px;
+  box-shadow: 6px 6px 0 #000;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.teacherquiz-config:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 9px 9px 0 #000;
+}
+
+/* ─── CONFIG TOPBAR (mirrors .profile-topbar) ───────── */
+.teacherquiz-config-topbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 28px;
+  background: #000;
+  border-bottom: 2px solid #000;
+}
+
+.teacherquiz-config-topbar::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #5cff8f;
+  flex-shrink: 0;
+}
+
+.teacherquiz-config-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+/* ─── CONFIG BODY ───────────────────────────────────── */
+.teacherquiz-config-body {
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ─── FIELD ROW (mirrors .info-row) ─────────────────── */
+.teacherquiz-field {
+  border: 2px solid #000;
+  border-radius: 10px;
+  padding: 12px 16px;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.teacherquiz-field:hover {
+  background: #f7f7f7;
+  transform: translateX(4px);
+}
+
+/* ─── FIELD LABEL (mirrors .info-label) ─────────────── */
+.teacherquiz-field-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #888;
+  margin-bottom: 6px;
+}
+
+/* ─── TEXT INPUT ─────────────────────────────────────── */
+.teacherquiz-input {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  font-weight: 700;
+  color: #000;
+  background: transparent;
+  letter-spacing: -0.01em;
+  box-sizing: border-box;
+}
+
+.teacherquiz-input::placeholder {
+  color: #bbb;
+  font-weight: 500;
+}
+
+/* ─── SELECT ─────────────────────────────────────────── */
+.teacherquiz-select {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  font-weight: 700;
+  color: #000;
+  background: transparent;
+  appearance: none;
+  cursor: pointer;
+  letter-spacing: -0.01em;
+}
+
+/* ─── QUESTIONS WRAPPER ──────────────────────────────── */
+.teacherquiz-questions {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ─── QUESTION CARD (mirrors .assignment-section) ───── */
+.question-card {
+  background: #fff;
+  border: 2px solid #000;
+  border-radius: 16px;
+  box-shadow: 6px 6px 0 #000;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.question-card:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 9px 9px 0 #000;
+}
+
+/* ─── QUESTION TOPBAR ────────────────────────────────── */
+.question-card-topbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 28px;
+  background: #000;
+  border-bottom: 2px solid #000;
+}
+
+.question-card-topbar::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.question-card-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+/* ─── QUESTION BODY ──────────────────────────────────── */
+.question-card-body {
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ─── QUESTION FIELD (mirrors .info-row) ────────────── */
+.question-field {
+  border: 2px solid #000;
+  border-radius: 10px;
+  padding: 12px 16px;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.question-field:hover {
+  background: #f7f7f7;
+  transform: translateX(4px);
+}
+
+.question-field-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #888;
+  margin-bottom: 6px;
+}
+
+.question-field input,
+.question-field select {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  font-weight: 700;
+  color: #000;
+  background: transparent;
+  appearance: none;
+  letter-spacing: -0.01em;
+  box-sizing: border-box;
+}
+
+.question-field input::placeholder {
+  color: #bbb;
+  font-weight: 500;
+}
+
+/* ─── OPTIONS GRID ───────────────────────────────────── */
+.options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* ─── CORRECT ANSWER FIELD — accent ─────────────────── */
+.question-field.correct-field {
+  border-color: #000;
+  background: #f9f9f9;
+}
+
+.question-field.correct-field .question-field-label {
+  color: #000;
+}
+
+/* ─── SUBMIT BUTTON (mirrors .edit-btn) ─────────────── */
+.teacherquiz-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin: 28px auto 0 auto;
+  padding: 12px 40px;
+  background: #000;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 2px solid #000;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+  max-width: 960px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.teacherquiz-submit:hover {
+  background: #fff;
+  color: #000;
+  transform: translateY(-1px);
+}
+
+/* ─── RESPONSIVE ─────────────────────────────────────── */
+@media (max-width: 700px) {
+  .teacherquiz-container {
+    padding: 24px 16px;
+  }
+
+  .options-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .teacherquiz-config-body {
+    padding: 20px 16px;
+  }
+
+  .question-card-body {
+    padding: 16px;
+  }
+}
