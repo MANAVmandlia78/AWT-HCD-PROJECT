@@ -1,4 +1,4 @@
-
+/* ─── GRADIENT BACKGROUND ORBS ─────────────────────── */
 .profile-container {
   margin-left: var(--sidebar-width);
   min-height: 100vh;
@@ -6,8 +6,50 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f5f5f5;
+  background: #fafafa;
   padding: 40px 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Soft gradient blobs like the reference image */
+.profile-container::before {
+  content: "";
+  position: absolute;
+  top: -120px;
+  right: -80px;
+  width: 480px;
+  height: 480px;
+  background: radial-gradient(circle, rgba(255, 180, 180, 0.55) 0%, rgba(255, 120, 180, 0.25) 50%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.profile-container::after {
+  content: "";
+  position: absolute;
+  bottom: -100px;
+  left: -60px;
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, rgba(130, 180, 255, 0.5) 0%, rgba(160, 130, 255, 0.2) 50%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Extra middle blob */
+.profile-container .gradient-mid {
+  position: absolute;
+  bottom: 20%;
+  right: 15%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(255, 220, 120, 0.35) 0%, rgba(255, 180, 80, 0.12) 55%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* ─── CARD ──────────────────────────────────────────── */
@@ -23,6 +65,8 @@
   flex-direction: column;
   overflow: hidden;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  z-index: 1;
 }
 
 .profile-card:hover {
@@ -37,7 +81,7 @@
   justify-content: space-between;
   padding: 16px 28px;
   border-bottom: 2px solid #000;
-  background: #000;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d1a3e 60%, #1a1a2e 100%);
 }
 
 .profile-label {
@@ -54,21 +98,21 @@
   align-items: center;
   gap: 7px;
   padding: 8px 18px;
-  background: #fff;
-  color: #000;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.04em;
-  border: 2px solid #fff;
+  border: 2px solid rgba(255, 255, 255, 0.45);
   border-radius: 8px;
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
 }
 
 .edit-btn:hover {
-  background: #000;
-  color: #fff;
-  border-color: #555;
+  background: #fff;
+  color: #1a1a2e;
+  border-color: #fff;
   transform: translateY(-1px);
 }
 
@@ -92,6 +136,7 @@
   gap: 16px;
   padding: 48px 40px;
   min-width: 260px;
+  background: linear-gradient(160deg, #fff9f0 0%, #fff0f5 50%, #f0f4ff 100%);
 }
 
 .avatar-wrapper {
@@ -103,9 +148,10 @@
 .avatar-wrapper img {
   width: 100%;
   height: 100%;
-  border: 2px solid #000;
+  border: 2.5px solid #000;
   border-radius: 14px;
   object-fit: cover;
+  box-shadow: 4px 4px 0 #000;
 }
 
 .avatar-badge {
@@ -114,7 +160,7 @@
   right: -10px;
   width: 36px;
   height: 36px;
-  background: #000;
+  background: linear-gradient(135deg, #ff6b9d, #ff4d7e);
   color: #fff;
   font-size: 10px;
   font-weight: 900;
@@ -124,6 +170,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 2px 2px 0 #000;
 }
 
 .profile-name {
@@ -132,6 +179,7 @@
   margin: 8px 0 0;
   text-align: center;
   letter-spacing: -0.02em;
+  color: #111;
 }
 
 .profile-dept-tag {
@@ -139,11 +187,12 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  background: #f0f0f0;
+  background: #fff;
   border: 1.5px solid #000;
   border-radius: 6px;
   padding: 5px 12px;
   color: #000;
+  box-shadow: 2px 2px 0 #000;
 }
 
 /* ─── VERTICAL DIVIDER ──────────────────────────────── */
@@ -161,6 +210,7 @@
   justify-content: center;
   padding: 48px 44px;
   gap: 24px;
+  background: #fff;
 }
 
 .section-heading {
@@ -176,20 +226,41 @@
 .profile-info {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
+/* Color accent per row using nth-child */
 .info-row {
   border: 2px solid #000;
   border-radius: 10px;
   padding: 14px 18px;
   transition: background 0.15s ease, transform 0.15s ease;
+  position: relative;
+  overflow: hidden;
 }
 
-.info-row:hover {
-  background: #f7f7f7;
-  transform: translateX(4px);
+/* Left color stripe accent per row */
+.info-row::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  border-radius: 0;
 }
+
+.info-row:nth-child(1)::before { background: #ff6b9d; }
+.info-row:nth-child(2)::before { background: #6b8eff; }
+.info-row:nth-child(3)::before { background: #ffc96b; }
+.info-row:nth-child(4)::before { background: #6bddaa; }
+.info-row:nth-child(5)::before { background: #b06bff; }
+
+.info-row:nth-child(1):hover { background: #fff5f9; transform: translateX(4px); }
+.info-row:nth-child(2):hover { background: #f5f7ff; transform: translateX(4px); }
+.info-row:nth-child(3):hover { background: #fffbf0; transform: translateX(4px); }
+.info-row:nth-child(4):hover { background: #f0fdf8; transform: translateX(4px); }
+.info-row:nth-child(5):hover { background: #faf5ff; transform: translateX(4px); }
 
 .info-label {
   display: block;

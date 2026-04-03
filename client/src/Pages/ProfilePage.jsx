@@ -15,6 +15,9 @@ const Profile = () => {
 
   return (
     <div className="profile-container">
+      {/* Ambient gradient blob (amber/yellow) */}
+      <div className="gradient-mid" />
+
       <div className="profile-card">
 
         {/* TOP BAR */}

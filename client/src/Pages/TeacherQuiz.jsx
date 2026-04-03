@@ -48,6 +48,10 @@ const TeacherQuiz = () => {
 
   return (
     <div className="teacherquiz-container">
+
+      {/* Ambient gradient blob */}
+      <div className="gradient-mid" />
+
       <span className="teacherquiz-title">Create Quiz</span>
 
       {/* ── Config Card ── */}
@@ -57,7 +61,6 @@ const TeacherQuiz = () => {
         </div>
 
         <div className="teacherquiz-config-body">
-          {/* Title */}
           <div className="teacherquiz-field">
             <label className="teacherquiz-field-label">Quiz Title</label>
             <input
@@ -68,7 +71,6 @@ const TeacherQuiz = () => {
             />
           </div>
 
-          {/* Number of questions */}
           <div className="teacherquiz-field">
             <label className="teacherquiz-field-label">Number of Questions</label>
             <select
@@ -89,15 +91,12 @@ const TeacherQuiz = () => {
         {questions.map((q, index) => (
           <div key={index} className="question-card">
 
-            {/* Topbar */}
             <div className="question-card-topbar">
               <span className="question-card-label">Question {index + 1}</span>
             </div>
 
-            {/* Body */}
             <div className="question-card-body">
 
-              {/* Question text */}
               <div className="question-field">
                 <label className="question-field-label">Question</label>
                 <input
@@ -107,7 +106,6 @@ const TeacherQuiz = () => {
                 />
               </div>
 
-              {/* Options grid */}
               <div className="options-grid">
                 {["A", "B", "C", "D"].map((opt) => (
                   <div className="question-field" key={opt}>
@@ -123,7 +121,6 @@ const TeacherQuiz = () => {
                 ))}
               </div>
 
-              {/* Correct answer */}
               <div className="question-field correct-field">
                 <label className="question-field-label">Correct Answer</label>
                 <select
@@ -145,6 +142,7 @@ const TeacherQuiz = () => {
       <button className="teacherquiz-submit" onClick={handleSubmit}>
         Create Quiz
       </button>
+
     </div>
   );
 };

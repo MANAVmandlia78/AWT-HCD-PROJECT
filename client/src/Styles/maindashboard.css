@@ -1,11 +1,54 @@
 @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700;800&display=swap');
+
 /* MAIN */
 .main {
   margin-left: var(--sidebar-width);
   width: calc(100% - var(--sidebar-width));
   min-height: 100vh;
   font-family: 'Comic Neue', sans-serif;
-  background: #fff;
+  background: #fafafa;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ─── GRADIENT BLOBS ────────────────────────────────── */
+.main::before {
+  content: "";
+  position: fixed;
+  top: -140px;
+  right: -100px;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(255, 160, 180, 0.5) 0%, rgba(255, 100, 160, 0.2) 50%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.main::after {
+  content: "";
+  position: fixed;
+  bottom: -120px;
+  left: calc(var(--sidebar-width, 0px) - 60px);
+  width: 440px;
+  height: 440px;
+  background: radial-gradient(circle, rgba(120, 160, 255, 0.45) 0%, rgba(150, 120, 255, 0.18) 50%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Extra amber blob */
+.main .gradient-mid {
+  position: fixed;
+  bottom: 15%;
+  right: 10%;
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(255, 215, 100, 0.35) 0%, rgba(255, 175, 60, 0.12) 55%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* TOPBAR */
@@ -15,24 +58,34 @@
   align-items: center;
   gap: 16px;
   padding: 0 24px;
-  border-bottom: 2px solid #000; /* softer */
-  background: #fff;
+  border-bottom: 2px solid #000;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d1a3e 60%, #1a1a2e 100%);
+  position: relative;
+  z-index: 10;
 }
 
 /* TITLE */
 .topbar-title {
   font-size: 20px;
-  font-weight: 800; /* slightly reduced */
+  font-weight: 800;
   flex: 1;
+  color: #fff;
+  letter-spacing: 0.1em;
 }
 
 /* SEARCH */
 .search-box {
-  border: 2px solid #000; /* softer */
-  border-radius: 8px; /* 👈 softness */
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 8px;
   padding: 6px 10px;
   width: 220px;
-  background: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.search-box:focus-within {
+  border-color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .search-box input {
@@ -40,6 +93,15 @@
   outline: none;
   font-weight: 600;
   width: 100%;
+  background: transparent;
+  color: #fff;
+  font-family: 'Comic Neue', sans-serif;
+}
+
+.search-box input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 12px;
+  letter-spacing: 0.08em;
 }
 
 /* ACTIONS */
@@ -53,20 +115,23 @@
 .icon-btn {
   width: 38px;
   height: 38px;
-  border: 2px solid #000;
-  border-radius: 8px; /* 👈 softness */
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   position: relative;
   font-weight: bold;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  transition: all 0.15s ease;
 }
 
-/* HOVER (soft push) */
 .icon-btn:hover {
   transform: translate(-2px, -2px);
-  box-shadow: 3px 3px 0 #000;
+  box-shadow: 3px 3px 0 rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 /* NOTIFICATION DOT */
@@ -76,8 +141,9 @@
   right: 6px;
   width: 7px;
   height: 7px;
-  background: #000;
+  background: #ff6b9d;
   border-radius: 50%;
+  border: 1.5px solid #fff;
 }
 
 /* BUTTON */
@@ -90,7 +156,6 @@
   cursor: pointer;
 }
 
-/* BUTTON HOVER */
 .btn-primary:hover {
   transform: translate(-2px, -2px);
   box-shadow: 3px 3px 0 #000;
@@ -100,17 +165,24 @@
 .topbar-avatar {
   width: 38px;
   height: 38px;
-  border: 2px solid #000;
+  border: 2px solid #fff;
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 800;
+  font-size: 13px;
+  background: linear-gradient(135deg, #ff6b9d, #b06bff);
+  color: #fff;
+  letter-spacing: 0.03em;
+  box-shadow: 2px 2px 0 rgba(255, 255, 255, 0.3);
 }
 
 /* CONTENT */
 .content {
-  padding: 20px; /* reduced */
+  padding: 20px;
+  position: relative;
+  z-index: 1;
 }
 
 /* FILTERS */
@@ -120,7 +192,6 @@
   margin-bottom: 20px;
 }
 
-/* FILTER SEARCH */
 .filter-search {
   border: 2px solid #000;
   border-radius: 8px;
@@ -135,7 +206,6 @@
   font-weight: 600;
 }
 
-/* SELECT */
 .select-box {
   border: 2px solid #000;
   border-radius: 8px;
@@ -144,7 +214,6 @@
   cursor: pointer;
 }
 
-/* HOVER */
 .select-box:hover {
   transform: translate(-2px, -2px);
   box-shadow: 3px 3px 0 #000;
@@ -154,18 +223,14 @@
 .courses-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 50px; /* reduced from 50px 🔥 */
+  gap: 50px;
 }
 
 /* RESPONSIVE */
 @media (max-width: 900px) {
-  .courses-grid {
-    gap: 16px;
-  }
+  .courses-grid { gap: 16px; }
 }
 
 @media (max-width: 600px) {
-  .courses-grid {
-    flex-direction: column;
-  }
+  .courses-grid { flex-direction: column; }
 }

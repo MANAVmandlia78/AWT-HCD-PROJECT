@@ -19,11 +19,11 @@ const LMSmain = () => {
         {/* <Maindashboard></Maindashboard> */}
         {/* <CourseDetail></CourseDetail> */}
         {/* <Profile></Profile> */}
-        {/* <TeacherQuiz></TeacherQuiz> */}
+        <TeacherQuiz></TeacherQuiz>
         {/* <StudentQuiz></StudentQuiz> */}
         {/* <Assignments></Assignments> */}
         {/* <Submissions></Submissions> */}
-        <QuizList></QuizList>
+        {/* <QuizList></QuizList> */}
         {/* <TeacherAssignments></TeacherAssignments> */}
         {/* <Calendar></Calendar> */}
     </div>
