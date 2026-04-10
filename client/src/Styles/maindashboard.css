@@ -2,7 +2,7 @@
 
 /* MAIN */
 .main {
-  margin-left: var(--sidebar-width);
+  margin-left: calc(var(--sidebar-width));
   width: calc(100% - var(--sidebar-width));
   min-height: 100vh;
   font-family: 'Comic Neue', sans-serif;
@@ -59,9 +59,35 @@
   gap: 16px;
   padding: 0 24px;
   border-bottom: 2px solid #000;
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d1a3e 60%, #1a1a2e 100%);
+  background: linear-gradient(135deg, #fff5f9 0%, #f5f7ff 40%, #fffbf0 75%, #f0fdf8 100%);
   position: relative;
   z-index: 10;
+  overflow: hidden;
+}
+
+/* Subtle shimmer blob inside topbar */
+.topbar::before {
+  content: "";
+  position: absolute;
+  top: -60px;
+  right: 80px;
+  width: 200px;
+  height: 160px;
+  background: radial-gradient(circle, rgba(176, 107, 255, 0.18) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.topbar::after {
+  content: "";
+  position: absolute;
+  top: -40px;
+  left: 120px;
+  width: 180px;
+  height: 140px;
+  background: radial-gradient(circle, rgba(255, 107, 157, 0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
 }
 
 /* TITLE */
@@ -69,23 +95,27 @@
   font-size: 20px;
   font-weight: 800;
   flex: 1;
-  color: #fff;
+  color: #000;
   letter-spacing: 0.1em;
+  position: relative;
+  z-index: 1;
 }
 
 /* SEARCH */
 .search-box {
-  border: 2px solid rgba(255, 255, 255, 0.4);
+  border: 2px solid #000;
   border-radius: 8px;
   padding: 6px 10px;
   width: 220px;
-  background: rgba(255, 255, 255, 0.1);
-  transition: border-color 0.15s ease, background 0.15s ease;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(4px);
+  position: relative;
+  z-index: 1;
+  transition: box-shadow 0.15s ease;
 }
 
 .search-box:focus-within {
-  border-color: rgba(255, 255, 255, 0.8);
-  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 3px 3px 0 #000;
 }
 
 .search-box input {
@@ -94,12 +124,12 @@
   font-weight: 600;
   width: 100%;
   background: transparent;
-  color: #fff;
+  color: #000;
   font-family: 'Comic Neue', sans-serif;
 }
 
 .search-box input::placeholder {
-  color: rgba(255, 255, 255, 0.5);
+  color: #aaa;
   font-size: 12px;
   letter-spacing: 0.08em;
 }
@@ -109,13 +139,14 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  position: relative;
+  z-index: 1;
 }
-
 /* ICON BUTTON */
 .icon-btn {
   width: 38px;
   height: 38px;
-  border: 2px solid rgba(255, 255, 255, 0.45);
+  border: 2px solid #000;
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -123,15 +154,14 @@
   cursor: pointer;
   position: relative;
   font-weight: bold;
-  color: #fff;
-  background: rgba(255, 255, 255, 0.1);
+  color: #000;
+  background: #fff;
   transition: all 0.15s ease;
 }
 
 .icon-btn:hover {
   transform: translate(-2px, -2px);
-  box-shadow: 3px 3px 0 rgba(255, 255, 255, 0.5);
-  background: rgba(255, 255, 255, 0.2);
+  box-shadow: 3px 3px 0 #000;
 }
 
 /* NOTIFICATION DOT */

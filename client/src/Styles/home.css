@@ -1,0 +1,337 @@
+@import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700;800&display=swap');
+
+* {
+  font-family: 'Comic Neue', sans-serif;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ─── ROOT ───────────────────────────────────────────── */
+.home-root {
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  background: #fafafa;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ─── GRADIENT BLOBS ────────────────────────────────── */
+.home-root::before {
+  content: "";
+  position: fixed;
+  top: -140px;
+  right: -100px;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(255, 160, 180, 0.5) 0%, rgba(255, 100, 160, 0.2) 50%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.home-root::after {
+  content: "";
+  position: fixed;
+  bottom: -120px;
+  left: -60px;
+  width: 440px;
+  height: 440px;
+  background: radial-gradient(circle, rgba(120, 160, 255, 0.45) 0%, rgba(150, 120, 255, 0.18) 50%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.home-root .gradient-mid {
+  position: fixed;
+  bottom: 20%;
+  right: 15%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(255, 215, 100, 0.32) 0%, rgba(255, 175, 60, 0.1) 55%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─── LEFT PANEL ─────────────────────────────────────── */
+.home-left {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 48px;
+  position: relative;
+  z-index: 1;
+}
+
+.home-left-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 420px;
+}
+
+/* Logo mark */
+.logo-mark {
+  width: 56px;
+  height: 56px;
+  border: 2px solid #000;
+  border-radius: 14px;
+  box-shadow: 4px 4px 0 #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  overflow: hidden;
+}
+
+.logo-mark svg {
+  width: 36px;
+  height: 36px;
+}
+
+/* Brand name */
+.home-brand {
+  font-size: 38px;
+  font-weight: 900;
+  color: #000;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  position: relative;
+}
+
+/* Rainbow underline on brand */
+.home-brand::after {
+  content: "";
+  display: block;
+  margin-top: 6px;
+  height: 4px;
+  width: 100%;
+  background: linear-gradient(90deg, #ff6b9d, #6b8eff, #ffc96b, #6bddaa, #b06bff);
+  border-radius: 2px;
+}
+
+.home-tagline {
+  font-size: 15px;
+  font-weight: 700;
+  color: #555;
+  letter-spacing: 0.02em;
+  margin-top: -6px;
+}
+
+/* Feature list */
+.home-features {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.feature-item {
+  font-size: 13px;
+  font-weight: 700;
+  color: #333;
+  padding: 12px 16px;
+  border: 2px solid #000;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 3px 3px 0 #000;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.feature-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+}
+
+.feature-item:nth-child(1)::before { background: #ff6b9d; }
+.feature-item:nth-child(2)::before { background: #6b8eff; }
+.feature-item:nth-child(3)::before { background: #6bddaa; }
+
+.feature-item:nth-child(1):hover { background: #fff5f9; transform: translateX(4px); box-shadow: 3px 3px 0 #000; }
+.feature-item:nth-child(2):hover { background: #f5f7ff; transform: translateX(4px); box-shadow: 3px 3px 0 #000; }
+.feature-item:nth-child(3):hover { background: #f0fdf8; transform: translateX(4px); box-shadow: 3px 3px 0 #000; }
+
+/* ─── VERTICAL DIVIDER ───────────────────────────────── */
+.home-divider {
+  width: 2px;
+  background: #000;
+  align-self: stretch;
+  z-index: 1;
+}
+
+/* ─── RIGHT PANEL ────────────────────────────────────── */
+.home-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 48px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── CARD ───────────────────────────────────────────── */
+.home-card {
+  width: 100%;
+  max-width: 400px;
+  background: #fff;
+  border: 2px solid #000;
+  border-radius: 16px;
+  box-shadow: 6px 6px 0 #000;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.home-card:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 9px 9px 0 #000;
+}
+
+/* Rainbow top stripe */
+.home-card::before {
+  content: "";
+  display: block;
+  height: 5px;
+  background: linear-gradient(90deg, #ff6b9d, #6b8eff, #ffc96b, #6bddaa, #b06bff);
+}
+
+/* Card title */
+.card-title {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #000;
+  padding: 18px 28px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-title::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #6b8eff;
+  border: 1.5px solid #000;
+  flex-shrink: 0;
+}
+
+/* Card body */
+.home-card-body {
+  padding: 20px 28px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ─── FIELD GROUP ────────────────────────────────────── */
+.field-group {
+  border: 2px solid #000;
+  border-radius: 10px;
+  padding: 12px 16px;
+  transition: background 0.15s ease, transform 0.15s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.field-group::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+}
+
+.field-group:nth-of-type(1)::before { background: #ff6b9d; }
+.field-group:nth-of-type(2)::before { background: #6b8eff; }
+
+.field-group:nth-of-type(1):focus-within { background: #fff5f9; }
+.field-group:nth-of-type(2):focus-within { background: #f5f7ff; }
+
+.field-group label {
+  display: block;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #888;
+  margin-bottom: 6px;
+}
+
+.field-group input {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  font-weight: 700;
+  color: #000;
+  background: transparent;
+  font-family: 'Comic Neue', sans-serif;
+}
+
+.field-group input::placeholder {
+  color: #bbb;
+  font-weight: 500;
+}
+
+/* ─── SUBMIT BUTTON ──────────────────────────────────── */
+.home-card button {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #ff6b9d, #b06bff);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 2px solid #000;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 #000;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  font-family: 'Comic Neue', sans-serif;
+}
+
+.home-card button:hover:not(:disabled) {
+  transform: translate(-3px, -3px);
+  box-shadow: 7px 7px 0 #000;
+  background: linear-gradient(135deg, #ff4d7e, #9b4dff);
+}
+
+.home-card button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: 2px 2px 0 #000;
+}
+
+/* ─── RESPONSIVE ─────────────────────────────────────── */
+@media (max-width: 768px) {
+  .home-root {
+    flex-direction: column;
+  }
+
+  .home-left {
+    padding: 40px 24px 20px;
+  }
+
+  .home-right {
+    padding: 20px 24px 40px;
+  }
+
+  .home-brand {
+    font-size: 28px;
+  }
+}

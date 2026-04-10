@@ -29,6 +29,7 @@ const CourseCard = ({ course, index = 0 }) => {
         cursor: "pointer",
         position: "relative",
         overflow: "hidden",
+        marginLeft: "35px"
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = "translate(-4px, -4px)";

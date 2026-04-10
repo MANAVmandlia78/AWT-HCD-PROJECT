@@ -1,28 +1,49 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "../Styles/maindashboard.css";
 import CourseCard from "../Components/CourseCard";
 import { MdNotificationsActive } from "react-icons/md";
+import axios from "axios";
 
 const Maindashboard = () => {
-  const courses = [
-    { title: "Database Management System", image: "/sketch-1.png" },
-    { title: "SQL Crash Course", image: "/sketch-3.png" },
-    { title: "SEO Training", image: "/sketch-4.png" },
-    { title: "Database Management System", image: "/sketch-1.png" },
-    { title: "SQL Crash Course", image: "/sketch-3.png" },
-    { title: "SEO Training", image: "/sketch-4.png" },
-    { title: "Database Management System", image: "/sketch-1.png" },
-    { title: "SQL Crash Course", image: "/sketch-3.png" },
-    { title: "SEO Training", image: "/sketch-4.png" },
-    { title: "Database Management System", image: "/sketch-1.png" },
-    { title: "SQL Crash Course", image: "/sketch-3.png" },
-    { title: "SEO Training", image: "/sketch-4.png" },
+  const [courses, setCourses] = useState([]);
+  const token = localStorage.getItem("token");
+
+  // 🎨 Random images
+  const images = [
+    "/sketch-1.png",
+    "/sketch-2.png",
+    "/sketch-3.png",
+    "/sketch-4.png",
   ];
+
+  useEffect(() => {
+    fetchCourses();
+  }, []);
+
+  const fetchCourses = async () => {
+    try {
+      const res = await axios.get("http://localhost:8000/api/courses", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      // 🔥 Add random image to each course
+      const updated = res.data.map((course) => ({
+        ...course,
+        image: images[Math.floor(Math.random() * images.length)],
+      }));
+
+      setCourses(updated);
+
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return (
     <div className="main">
 
-      {/* Ambient gradient blob (amber) */}
       <div className="gradient-mid" />
 
       {/* TOPBAR */}
@@ -38,7 +59,6 @@ const Maindashboard = () => {
             <MdNotificationsActive />
             <span className="notif-dot"></span>
           </div>
-
         </div>
       </header>
 
@@ -46,7 +66,7 @@ const Maindashboard = () => {
       <main className="content">
         <div className="courses-grid">
           {courses.map((course, index) => (
-            <CourseCard key={index} course={course} index={index} />
+            <CourseCard key={course.id} course={course} index={index} />
           ))}
         </div>
       </main>

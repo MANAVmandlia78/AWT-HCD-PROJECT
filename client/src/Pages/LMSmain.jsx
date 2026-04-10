@@ -12,14 +12,18 @@ import TeacherAssignments from './TeacherAssignments'
 import TeacherQuiz from './TeacherQuiz'
 import StudentQuiz from './StudentQuiz'
 import QuizList from './QuizList'
+import TeacherCourses from '../Components/TeacherCourses'
+import EnrollCourse from '../Components/EnrollCourse'
 const LMSmain = () => {
   return (
     <div className="lms-layout">
         <Sidebar></Sidebar>
-        {/* <Maindashboard></Maindashboard> */}
+        <Maindashboard></Maindashboard>
+        {/* <TeacherCourses></TeacherCourses> */}
+        {/* <EnrollCourse></EnrollCourse> */}
         {/* <CourseDetail></CourseDetail> */}
         {/* <Profile></Profile> */}
-        <TeacherQuiz></TeacherQuiz>
+        {/* <TeacherQuiz></TeacherQuiz> */}
         {/* <StudentQuiz></StudentQuiz> */}
         {/* <Assignments></Assignments> */}
         {/* <Submissions></Submissions> */}

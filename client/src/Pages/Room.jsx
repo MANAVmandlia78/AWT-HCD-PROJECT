@@ -1,7 +1,8 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSocket } from "../Providers/Socket";
 import Whiteboard from "./Whiteboard";
+import "../Styles/room.css";
 
 const rtcConfig = {
   iceServers: [
@@ -13,361 +14,235 @@ const rtcConfig = {
 const Room = () => {
   const socket = useSocket();
   const { roomId } = useParams();
-  // const myEmail = useMemo(() => localStorage.getItem("webrtc-email") || "", []);
 
   const [participants, setParticipants] = useState([]);
-  const [currentSharer, setCurrentSharer] = useState(null); // {socketId, emailId}
+  const [currentSharer, setCurrentSharer] = useState(null);
   const [myStream, setMyStream] = useState(null);
   const [remoteStream, setRemoteStream] = useState(null);
   const [isSharing, setIsSharing] = useState(false);
   const [notice, setNotice] = useState("");
 
-  const peersRef = useRef(new Map()); // remoteSocketId -> RTCPeerConnection
+  const peersRef = useRef(new Map());
   const participantsRef = useRef([]);
   const remoteStreamRef = useRef(null);
   const myStreamRef = useRef(null);
 
-  useEffect(() => {
-    participantsRef.current = participants;
-  }, [participants]);
+  useEffect(() => { participantsRef.current = participants; }, [participants]);
+  useEffect(() => { myStreamRef.current = myStream; }, [myStream]);
 
-  useEffect(() => {
-    myStreamRef.current = myStream;
-  }, [myStream]);
-
-  const closePeerConnection = useCallback((remoteSocketId) => {
-    const pc = peersRef.current.get(remoteSocketId);
-    if (pc) {
-      pc.ontrack = null;
-      pc.onicecandidate = null;
-      pc.close();
-      peersRef.current.delete(remoteSocketId);
-    }
+  const closePeerConnection = useCallback((id) => {
+    const pc = peersRef.current.get(id);
+    if (pc) { pc.close(); peersRef.current.delete(id); }
   }, []);
 
   const closeAllPeerConnections = useCallback(() => {
-    for (const remoteSocketId of peersRef.current.keys()) {
-      closePeerConnection(remoteSocketId);
-    }
+    peersRef.current.forEach((_, id) => closePeerConnection(id));
   }, [closePeerConnection]);
 
-  const createPeerConnection = useCallback(
-    (remoteSocketId) => {
-      if (peersRef.current.has(remoteSocketId)) {
-        return peersRef.current.get(remoteSocketId);
-      }
+  const createPeerConnection = useCallback((id) => {
+    if (peersRef.current.has(id)) return peersRef.current.get(id);
 
-      const pc = new RTCPeerConnection(rtcConfig);
+    const pc = new RTCPeerConnection(rtcConfig);
 
-      pc.onicecandidate = (event) => {
-        if (event.candidate) {
-          socket.emit("webrtc-ice-candidate", {
-            to: remoteSocketId,
-            candidate: event.candidate,
-          });
-        }
-      };
+    pc.onicecandidate = (e) => {
+      if (e.candidate) socket.emit("webrtc-ice-candidate", { to: id, candidate: e.candidate });
+    };
 
-      pc.ontrack = (event) => {
-  const stream = event.streams[0];
-  if (stream) {
-    setRemoteStream(stream);
-    remoteStreamRef.current = stream;
-  }
-};
+    pc.ontrack = (e) => {
+      const stream = e.streams[0];
+      if (stream) { setRemoteStream(stream); remoteStreamRef.current = stream; }
+    };
 
-      peersRef.current.set(remoteSocketId, pc);
-      return pc;
-    },
-    [socket]
-  );
+    peersRef.current.set(id, pc);
+    return pc;
+  }, [socket]);
 
-  const addOrReplaceTracks = useCallback((pc, stream) => {
-    const senders = pc.getSenders();
-    stream.getTracks().forEach((track) => {
-      const existing = senders.find((s) => s.track && s.track.kind === track.kind);
-      if (existing) {
-        existing.replaceTrack(track);
-      } else {
-        pc.addTrack(track, stream);
-      }
-    });
+  const addTracks = useCallback((pc, stream) => {
+    stream.getTracks().forEach((track) => pc.addTrack(track, stream));
   }, []);
 
-  const createOfferForViewer = useCallback(
-    async (viewerSocketId) => {
-      const stream = myStreamRef.current;
-      if (!stream) return;
-      const pc = createPeerConnection(viewerSocketId);
-      addOrReplaceTracks(pc, stream);
-      const offer = await pc.createOffer();
-      await pc.setLocalDescription(offer);
-      socket.emit("webrtc-offer", { to: viewerSocketId, offer });
-    },
-    [addOrReplaceTracks, createPeerConnection, socket]
-  );
+  const createOffer = useCallback(async (id) => {
+    const stream = myStreamRef.current;
+    if (!stream) return;
 
-  const stopScreenShare = useCallback(() => {
-    if (myStreamRef.current) {
-      myStreamRef.current.getTracks().forEach((t) => t.stop());
-    }
-    myStreamRef.current = null;
-    setMyStream(null);
-    setIsSharing(false);
-    socket.emit("stop-screen-share");
-    closeAllPeerConnections();
-  }, [closeAllPeerConnections, socket]);
+    const pc = createPeerConnection(id);
+    addTracks(pc, stream);
 
-  const isAnotherUserPresenting = Boolean(currentSharer && currentSharer.socketId !== socket?.id);
-  const singleScreenStream = isSharing ? myStream : remoteStream;
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+    socket.emit("webrtc-offer", { to: id, offer });
+  }, [addTracks, createPeerConnection, socket]);
 
-  const startScreenShare = useCallback(async () => {
+  const startScreenShare = async () => {
     if (!socket?.id) return;
+
     if (currentSharer && currentSharer.socketId !== socket.id) {
-      setNotice(`Another user is already sharing.`);
+      setNotice("Another user is already sharing");
       return;
     }
 
     try {
-      const stream = await navigator.mediaDevices.getDisplayMedia({
-        video: true,
-        audio: true,
-      });
-      stream.getTracks().forEach((track) => {
-        track.onended = () => stopScreenShare();
-      });
-
-      setNotice("");
+      const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+      stream.getTracks().forEach((t) => { t.onended = stopScreenShare; });
       setMyStream(stream);
       setIsSharing(true);
       socket.emit("request-screen-share");
-    } catch (error) {
-      console.error("Error starting screen share:", error);
+    } catch (err) {
+      console.error(err);
     }
-  }, [currentSharer, socket, stopScreenShare]);
+  };
+
+  const stopScreenShare = () => {
+    myStreamRef.current?.getTracks().forEach((t) => t.stop());
+    setMyStream(null);
+    setIsSharing(false);
+    socket.emit("stop-screen-share");
+    closeAllPeerConnections();
+  };
 
   useEffect(() => {
     if (!socket || !roomId) return;
     const token = localStorage.getItem("token");
+    if (!token) return;
 
-if (token) {
-  socket.emit("join-room", { roomId, token });
-}
-    socket.emit("get-room-state");
-  }, [myEmail, roomId, socket]);
+    socket.emit("join-room", { roomId, token });
+    socket.on("joined-room", () => socket.emit("get-room-state"));
+    return () => { socket.off("joined-room"); };
+  }, [roomId, socket]);
 
   useEffect(() => {
     if (!socket) return;
 
-    const handleJoinedRoom = ({ participants: initialParticipants = [], currentSharer: sharer = null }) => {
-      setParticipants(initialParticipants);
-      setCurrentSharer(sharer);
-    };
+    socket.on("room-state", ({ participants, currentSharer }) => {
+      setParticipants(participants);
+      setCurrentSharer(currentSharer);
+    });
 
-    const handleRoomState = ({ participants: stateParticipants = [], currentSharer: sharer = null }) => {
-      setParticipants(stateParticipants);
-      setCurrentSharer(sharer);
-    };
+    socket.on("participants-update", ({ participants }) => setParticipants(participants));
 
-    const handleParticipantsUpdate = ({ participants: nextParticipants = [] }) => {
-      setParticipants(nextParticipants);
-    };
+    socket.on("participant-joined", async ({ socketId }) => {
+      if (isSharing) await createOffer(socketId);
+    });
 
-    const handleParticipantJoined = async ({ socketId }) => {
-      if (isSharing && socket.id && socket.id === currentSharer?.socketId) {
-        await createOfferForViewer(socketId);
-      }
-    };
+    socket.on("participant-left", ({ socketId }) => closePeerConnection(socketId));
 
-    const handleParticipantLeft = ({ socketId }) => {
-      closePeerConnection(socketId);
-      if (currentSharer?.socketId === socketId) {
-        remoteStreamRef.current = null;
-        setRemoteStream(null);
-        setCurrentSharer(null);
-      }
-    };
-
-    const handleScreenShareStarted = async ({ sharerSocketId, sharerEmail }) => {
-      setCurrentSharer({ socketId: sharerSocketId, userId: sharerEmail });
-      setNotice("");
-
+    socket.on("screen-share-started", ({ sharerSocketId, userId }) => {
+      setCurrentSharer({ socketId: sharerSocketId, userId });
       if (socket.id === sharerSocketId) {
-        const viewers = participantsRef.current.filter((p) => p.socketId !== socket.id);
-        for (const viewer of viewers) {
-          await createOfferForViewer(viewer.socketId);
-        }
-      } else {
-        remoteStreamRef.current = null;
-        setRemoteStream(null);
+        participantsRef.current.forEach((p) => {
+          if (p.socketId !== socket.id) createOffer(p.socketId);
+        });
       }
-    };
+    });
 
-    const handleScreenShareDenied = ({ sharerEmail }) => {
-      setNotice(`Another user is already sharing.`);
-      if (myStreamRef.current) {
-        myStreamRef.current.getTracks().forEach((t) => t.stop());
-      }
-      myStreamRef.current = null;
-      setMyStream(null);
-      setIsSharing(false);
-    };
-
-    const handleScreenShareStopped = () => {
+    socket.on("screen-share-stopped", () => {
       setCurrentSharer(null);
-      setIsSharing(false);
-      remoteStreamRef.current = null;
       setRemoteStream(null);
       closeAllPeerConnections();
-    };
+    });
 
-    const handleWebRtcOffer = async ({ from, offer }) => {
+    socket.on("webrtc-offer", async ({ from, offer }) => {
       const pc = createPeerConnection(from);
       await pc.setRemoteDescription(offer);
       const answer = await pc.createAnswer();
       await pc.setLocalDescription(answer);
       socket.emit("webrtc-answer", { to: from, answer });
-    };
+    });
 
-    const handleWebRtcAnswer = async ({ from, answer }) => {
+    socket.on("webrtc-answer", async ({ from, answer }) => {
       const pc = peersRef.current.get(from);
-      if (!pc) return;
-      await pc.setRemoteDescription(answer);
-    };
+      if (pc) await pc.setRemoteDescription(answer);
+    });
 
-    const handleIceCandidate = async ({ from, candidate }) => {
-      const pc = peersRef.current.get(from) || createPeerConnection(from);
-      if (!candidate) return;
-      try {
-        await pc.addIceCandidate(candidate);
-      } catch (error) {
-        console.error("Failed to add ICE candidate:", error);
-      }
-    };
-
-    socket.on("joined-room", handleJoinedRoom);
-    socket.on("room-state", handleRoomState);
-    socket.on("participants-update", handleParticipantsUpdate);
-    socket.on("participant-joined", handleParticipantJoined);
-    socket.on("participant-left", handleParticipantLeft);
-    socket.on("screen-share-started", handleScreenShareStarted);
-    socket.on("screen-share-denied", handleScreenShareDenied);
-    socket.on("screen-share-stopped", handleScreenShareStopped);
-    socket.on("webrtc-offer", handleWebRtcOffer);
-    socket.on("webrtc-answer", handleWebRtcAnswer);
-    socket.on("webrtc-ice-candidate", handleIceCandidate);
+    socket.on("webrtc-ice-candidate", async ({ from, candidate }) => {
+      const pc = createPeerConnection(from);
+      if (candidate) await pc.addIceCandidate(candidate);
+    });
 
     return () => {
-      socket.off("joined-room", handleJoinedRoom);
-      socket.off("room-state", handleRoomState);
-      socket.off("participants-update", handleParticipantsUpdate);
-      socket.off("participant-joined", handleParticipantJoined);
-      socket.off("participant-left", handleParticipantLeft);
-      socket.off("screen-share-started", handleScreenShareStarted);
-      socket.off("screen-share-denied", handleScreenShareDenied);
-      socket.off("screen-share-stopped", handleScreenShareStopped);
-      socket.off("webrtc-offer", handleWebRtcOffer);
-      socket.off("webrtc-answer", handleWebRtcAnswer);
-      socket.off("webrtc-ice-candidate", handleIceCandidate);
+      socket.off("room-state");
+      socket.off("participants-update");
+      socket.off("participant-joined");
+      socket.off("participant-left");
+      socket.off("screen-share-started");
+      socket.off("screen-share-stopped");
+      socket.off("webrtc-offer");
+      socket.off("webrtc-answer");
+      socket.off("webrtc-ice-candidate");
     };
-  }, [
-    closeAllPeerConnections,
-    closePeerConnection,
-    createOfferForViewer,
-    createPeerConnection,
-    currentSharer,
-    isSharing,
-    socket,
-  ]);
+  }, [socket, createOffer, createPeerConnection, closePeerConnection, isSharing]);
 
-  useEffect(() => {
-    return () => {
-      closeAllPeerConnections();
-      if (myStreamRef.current) {
-        myStreamRef.current.getTracks().forEach((t) => t.stop());
-      }
-    };
-  }, [closeAllPeerConnections]);
+  const screenStream = isSharing
+    ? myStream
+    : remoteStreamRef.current || remoteStream;
 
   return (
     <div className="room-root">
-      <header className="room-header">
-        <div className="room-header-left">
-          <div className="room-logo">
-          <img 
-  src="/black_white_on_trans.png"
-  alt="error" 
-  width="90" 
-  height="85" 
-/>
-            <span className="room-logo-text">ClassConnect</span>
+
+      {/* Ambient gradient blob */}
+      <div className="gradient-mid" />
+
+      {/* ── TOPBAR ── */}
+      <header className="room-topbar">
+        <div className="room-id-tag">Room: {roomId}</div>
+
+        <div className="room-participants-pill">
+          {participants.length} participant{participants.length !== 1 ? "s" : ""}
+        </div>
+
+        {currentSharer && (
+          <div className="room-sharer-notice">
+            Sharing: {currentSharer.userId}
           </div>
-          <span className="room-header-people" title="People in this room">
-            {participants.length}{" "}
-            {participants.length === 1 ? "person" : "people"}
-          </span>
-        </div>
-        <div className="room-status">
-          {currentSharer ? (
-            <span className="status-badge connected">
-              <span className="status-dot" />
-              Sharing: {currentSharer.userId}
-            </span>
-          ) : (
-            <span className="status-badge waiting">
-              <span className="status-dot waiting-dot" />
-              No one is sharing
-            </span>
-          )}
-        </div>
-        {!isAnotherUserPresenting ? (
-          <button
-            className={`share-btn ${isSharing ? "sharing" : ""}`}
-            onClick={isSharing ? stopScreenShare : startScreenShare}
-          >
-            {isSharing ? "Stop Sharing" : "Share Screen"}
-          </button>
-        ) : (
-          <span className="status-badge waiting">
-            Viewing {currentSharer?.userId}
-          </span>
         )}
+
+        <button
+          className={`room-share-btn ${isSharing ? "stop" : "start"}`}
+          onClick={isSharing ? stopScreenShare : startScreenShare}
+        >
+          {isSharing ? "Stop Sharing" : "Share Screen"}
+        </button>
       </header>
 
-      {notice ? <p className="room-notice">{notice}</p> : null}
+      {/* ── BODY ── */}
+      <div className="room-body">
 
-      <main className="room-main room-main-split">
-        <div className="room-screen-col">
-          <div className={`video-card ${!singleScreenStream ? "empty" : ""}`}>
-            <div className="video-label">
-              {currentSharer
-                ? `${currentSharer.userId}'s Screen`
-                : "Live Screen"}
-            </div>
-            {singleScreenStream ? (
-              
+        {/* LEFT — Screen share */}
+        <div className="room-screen-panel">
+          <div className="room-panel-topbar">
+            <span className="room-panel-label">Screen Share</span>
+          </div>
+          <div className="room-screen-content">
+            {screenStream ? (
               <video
-                ref={(video) => {
-                  if (video) video.srcObject = singleScreenStream;
-                }}
+                className="room-video"
                 autoPlay
                 muted
                 playsInline
-                className="video-el"
+                ref={(v) => v && (v.srcObject = screenStream)}
               />
             ) : (
-              <div className="video-placeholder">
-                <p>No active screen share yet.</p>
+              <div className="room-no-screen">
+                <div className="room-no-screen-icon">🖥</div>
+                <p>No screen being shared</p>
               </div>
             )}
           </div>
         </div>
-        <div className="room-whiteboard-col">
-          <div className="room-whiteboard-inner">
+
+        <div className="room-divider" />
+
+        {/* RIGHT — Whiteboard */}
+        <div className="room-whiteboard-panel">
+          <div className="room-panel-topbar">
+            <span className="room-panel-label">Whiteboard</span>
+          </div>
+          <div className="room-whiteboard-content">
             <Whiteboard />
           </div>
         </div>
-      </main>
+
+      </div>
     </div>
   );
 };

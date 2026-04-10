@@ -1,36 +1,22 @@
 import React from "react";
 import "../Styles/courseDetail.css";
-import assigmentimage from "/assigment-image.png";
+
 const CourseDetail = () => {
   const features = [
-  {
-    title: "Assignments",
-    desc: "View and submit tasks",
-    image: "/assigment-image.png",
-  },
-  {
-    title: "Quizzes",
-    desc: "Test your knowledge",
-    image: "/quiz-image.png",
-  },
-  {
-    title: "Live Classes",
-    desc: "Join live sessions",
-    image: "/live-image.png",
-  },
-  {
-    title: "Announcements",
-    desc: "Latest updates",
-    image: "/announcement-image.png",
-  },
-];
+    { title: "Assignments", desc: "View and submit tasks", image: "/assigment-image.png" },
+    { title: "Quizzes", desc: "Test your knowledge", image: "/quiz-image.png" },
+    { title: "Live Classes", desc: "Join live sessions", image: "/live-image.png" },
+    { title: "Announcements", desc: "Latest updates", image: "/announcement-image.png" },
+  ];
 
   return (
     <div className="course-detail">
 
+      {/* Ambient gradient blob */}
+      <div className="gradient-mid" />
+
       {/* HEADER */}
       <div className="course-header">
-
         <div className="course-header-left">
           <h1>Database Management System</h1>
           <p className="instructor">By Prof. Sharma</p>
@@ -38,27 +24,22 @@ const CourseDetail = () => {
             Learn the fundamentals of database systems, SQL, and data modeling.
           </p>
         </div>
-
       </div>
 
       {/* FEATURES */}
       <div className="feature-grid">
         {features.map((item, index) => (
           <div key={index} className="feature-card">
-
-            {/* IMAGE PLACEHOLDER */}
             <div className="feature-image">
-                <img src={item.image} alt={item.title} />
+              <img src={item.image} alt={item.title} />
             </div>
-
             <h3>{item.title}</h3>
             <p>{item.desc}</p>
-
           </div>
         ))}
       </div>
 
-      {/* OPTIONAL SECTION */}
+      {/* ACTIVITY */}
       <div className="activity-section">
         <h3>Recent Activity</h3>
         <ul>

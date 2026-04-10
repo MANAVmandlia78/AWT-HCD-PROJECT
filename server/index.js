@@ -16,37 +16,29 @@ app.use(cors({
 app.use(express.json());
 app.use(bodyParser.json());
 app.use("/api/auth", authRoutes);
-app.get("/api/assignments", (req, res) => {
+app.get("/api/assignments/:courseId", (req, res) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(401).json({ message: "No token" });
 
     const user = jwt.verify(token, process.env.JWT_SECRET);
-
-    // 🔥 Only students (optional but recommended)
-    if (user.role !== "student" && user.role !== "teacher") {
-      return res.status(403).json({ message: "Access denied" });
-    }
+    const courseId = req.params.courseId;
 
     const query = `
       SELECT assignments.*, users.name AS teacher_name
       FROM assignments
       JOIN users ON assignments.teacher_id = users.id
-      WHERE assignments.department_id = ?
+      WHERE assignments.course_id = ?
       ORDER BY assignments.created_at DESC
     `;
 
-    db.query(query, [user.department_id], (err, result) => {
-      if (err) {
-        console.log(err);
-        return res.status(500).json(err);
-      }
+    db.query(query, [courseId], (err, result) => {
+      if (err) return res.status(500).json(err);
 
       res.json(result);
     });
 
   } catch (err) {
-    console.log(err);
     res.status(401).json({ message: "Invalid token" });
   }
 });
@@ -67,34 +59,189 @@ app.post("/api/submissions", async (req, res) => {
       return res.status(400).json({ message: "Assignment ID and file URL required" });
     }
 
+    // 🔥 Get course_id of assignment
+    const getCourseQuery = `
+      SELECT course_id FROM assignments WHERE id = ?
+    `;
+
+    db.query(getCourseQuery, [assignment_id], (err, result) => {
+      if (err) return res.status(500).json(err);
+
+      const courseId = result[0].course_id;
+
+      // 🔥 Check student enrolled
+      const checkEnrollQuery = `
+        SELECT * FROM course_enrollments 
+        WHERE student_id = ? AND course_id = ?
+      `;
+
+      db.query(checkEnrollQuery, [user.id, courseId], (err2, enrollResult) => {
+        if (err2) return res.status(500).json(err2);
+
+        if (enrollResult.length === 0) {
+          return res.status(403).json({ message: "Not enrolled in this course" });
+        }
+
+        const insertQuery = `
+          INSERT INTO submissions (assignment_id, student_id, file_url)
+          VALUES (?, ?, ?)
+        `;
+
+        db.query(insertQuery, [assignment_id, user.id, file_url], (err3) => {
+          if (err3) {
+            if (err3.code === "ER_DUP_ENTRY") {
+              return res.status(400).json({
+                message: "You already submitted this assignment",
+              });
+            }
+
+            return res.status(500).json(err3);
+          }
+
+          res.json({
+            message: "Assignment submitted successfully",
+            fileUrl: file_url,
+          });
+        });
+      });
+    });
+
+  } catch (err) {
+    res.status(401).json({ message: "Invalid token" });
+  }
+});
+const crypto = require("crypto");
+app.post("/api/courses", (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) return res.status(401).json({ message: "No token" });
+
+    const user = jwt.verify(token, process.env.JWT_SECRET);
+
+    // ✅ Only teacher
+    if (user.role !== "teacher") {
+      return res.status(403).json({ message: "Only teachers can create courses" });
+    }
+
+    const { title, description } = req.body;
+
+    if (!title) {
+      return res.status(400).json({ message: "Title required" });
+    }
+
+    // 🔥 Generate unique enrollment code
+    const enrollment_code = crypto.randomBytes(3).toString("hex"); 
+    // Example: a1b2c3
+
     const query = `
-      INSERT INTO submissions (assignment_id, student_id, file_url)
-      VALUES (?, ?, ?)
+      INSERT INTO courses (title, description, teacher_id, enrollment_code)
+      VALUES (?, ?, ?, ?)
     `;
 
     db.query(
       query,
-      [assignment_id, user.id, file_url],
-      (err, data) => {
-        if (err) {
-          if (err.code === "ER_DUP_ENTRY") {
-            return res.status(400).json({
-              message: "You already submitted this assignment",
-            });
-          }
-
-          return res.status(500).json(err);
-        }
+      [title, description, user.id, enrollment_code],
+      (err, result) => {
+        if (err) return res.status(500).json(err);
 
         res.json({
-          message: "Assignment submitted successfully",
-          fileUrl: file_url,
+          message: "Course created successfully",
+          courseId: result.insertId,
+          enrollment_code,
         });
       }
     );
 
   } catch (err) {
-    console.log(err);
+    res.status(401).json({ message: "Invalid token" });
+  }
+});
+app.get("/api/courses", (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
+    const user = jwt.verify(token, process.env.JWT_SECRET);
+
+    let query;
+    let params;
+
+    if (user.role === "teacher") {
+      // Teacher sees their courses
+      query = `SELECT * FROM courses WHERE teacher_id = ?`;
+      params = [user.id];
+    } else {
+      // Student sees enrolled courses ONLY
+      query = `
+        SELECT c.*
+        FROM courses c
+        JOIN course_enrollments ce ON c.id = ce.course_id
+        WHERE ce.student_id = ?
+      `;
+      params = [user.id];
+    }
+
+    db.query(query, params, (err, result) => {
+      if (err) return res.status(500).json(err);
+
+      res.json(result);
+    });
+
+  } catch (err) {
+    res.status(401).json({ message: "Invalid token" });
+  }
+});
+app.post("/api/courses/enroll", (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) return res.status(401).json({ message: "No token" });
+
+    const user = jwt.verify(token, process.env.JWT_SECRET);
+
+    // ✅ Only students can enroll
+    if (user.role !== "student") {
+      return res.status(403).json({ message: "Only students can enroll" });
+    }
+
+    const { enrollment_code } = req.body;
+
+    if (!enrollment_code) {
+      return res.status(400).json({ message: "Enrollment code required" });
+    }
+
+    // 🔥 Step 1: Find course
+    const findCourseQuery = `SELECT id FROM courses WHERE enrollment_code = ?`;
+
+    db.query(findCourseQuery, [enrollment_code], (err, courseResult) => {
+      if (err) return res.status(500).json(err);
+
+      if (courseResult.length === 0) {
+        return res.status(404).json({ message: "Invalid course code" });
+      }
+
+      const courseId = courseResult[0].id;
+
+      // 🔥 Step 2: Insert enrollment
+      const enrollQuery = `
+        INSERT INTO course_enrollments (student_id, course_id)
+        VALUES (?, ?)
+      `;
+
+      db.query(enrollQuery, [user.id, courseId], (err2) => {
+        if (err2) {
+          if (err2.code === "ER_DUP_ENTRY") {
+            return res.status(400).json({ message: "Already enrolled" });
+          }
+
+          return res.status(500).json(err2);
+        }
+
+        res.json({
+          message: "Enrolled successfully",
+          courseId,
+        });
+      });
+    });
+
+  } catch (err) {
     res.status(401).json({ message: "Invalid token" });
   }
 });
@@ -185,55 +332,93 @@ app.post("/api/quizzes", async (req, res) => {
       return res.status(403).json({ message: "Only teachers can create quiz" });
     }
 
-    const { title, questions } = req.body;
+    const { title, questions, course_id } = req.body;
 
-    if (!title || !questions || questions.length < 10) {
+    if (!title || !questions || questions.length < 10 || !course_id) {
       return res.status(400).json({ message: "Invalid data" });
     }
 
-    // 🔥 Insert quiz
-    const quizQuery = `
-      INSERT INTO quizzes (title, teacher_id, total_questions)
-      VALUES (?, ?, ?)
+    // 🔥 CHECK: teacher owns course
+    const checkCourseQuery = `
+      SELECT * FROM courses WHERE id = ? AND teacher_id = ?
     `;
 
-    db.query(
-      quizQuery,
-      [title, user.id, questions.length],
-      (err, quizResult) => {
-        if (err) return res.status(500).json(err);
+    db.query(checkCourseQuery, [course_id, user.id], (err, courseResult) => {
+      if (err) return res.status(500).json(err);
 
-        const quizId = quizResult.insertId;
-
-        // 🔥 Prepare bulk insert for questions
-        const questionValues = questions.map((q) => [
-          quizId,
-          q.question,
-          q.optionA,
-          q.optionB,
-          q.optionC,
-          q.optionD,
-          q.correct,
-        ]);
-
-        const questionQuery = `
-          INSERT INTO questions
-          (quiz_id, question_text, option_a, option_b, option_c, option_d, correct_option)
-          VALUES ?
-        `;
-
-        db.query(questionQuery, [questionValues], (err2) => {
-          if (err2) return res.status(500).json(err2);
-
-          res.json({
-            message: "Quiz created successfully",
-            quizId,
-          });
-        });
+      if (courseResult.length === 0) {
+        return res.status(403).json({ message: "You don't own this course" });
       }
-    );
+
+      // 🔥 Insert quiz with course_id
+      const quizQuery = `
+        INSERT INTO quizzes (title, teacher_id, course_id, total_questions)
+        VALUES (?, ?, ?, ?)
+      `;
+
+      db.query(
+        quizQuery,
+        [title, user.id, course_id, questions.length],
+        (err, quizResult) => {
+          if (err) return res.status(500).json(err);
+
+          const quizId = quizResult.insertId;
+
+          const questionValues = questions.map((q) => [
+            quizId,
+            q.question,
+            q.optionA,
+            q.optionB,
+            q.optionC,
+            q.optionD,
+            q.correct,
+          ]);
+
+          const questionQuery = `
+            INSERT INTO questions
+            (quiz_id, question_text, option_a, option_b, option_c, option_d, correct_option)
+            VALUES ?
+          `;
+
+          db.query(questionQuery, [questionValues], (err2) => {
+            if (err2) return res.status(500).json(err2);
+
+            res.json({
+              message: "Quiz created successfully",
+              quizId,
+            });
+          });
+        }
+      );
+    });
+
   } catch (err) {
-    console.log(err);
+    res.status(401).json({ message: "Invalid token" });
+  }
+});
+
+app.get("/api/quizzes/:courseId", (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
+    const user = jwt.verify(token, process.env.JWT_SECRET);
+
+    const courseId = req.params.courseId;
+
+    const query = `
+      SELECT quizzes.*, users.name AS teacher_name
+      FROM quizzes
+      JOIN users ON quizzes.teacher_id = users.id
+      WHERE quizzes.course_id = ?
+      ORDER BY quizzes.created_at DESC
+    `;
+
+    db.query(query, [courseId], (err, result) => {
+      if (err) return res.status(500).json(err);
+
+      res.json(result);
+    });
+
+  } catch (err) {
     res.status(401).json({ message: "Invalid token" });
   }
 });
@@ -267,59 +452,71 @@ app.post("/api/quizzes/submit", (req, res) => {
 
     const user = jwt.verify(token, process.env.JWT_SECRET);
 
-    // 🔥 safer role check
     if (user.role?.toLowerCase().trim() !== "student") {
       return res.status(403).json({ message: "Only students can submit" });
     }
 
     const { quiz_id, answers } = req.body;
 
-    if (!quiz_id || !answers) {
-      return res.status(400).json({ message: "Invalid data" });
-    }
-
-    // 🔥 Get correct answers
-    const query = `
-      SELECT id, correct_option 
-      FROM questions 
-      WHERE quiz_id = ?
+    // 🔥 Get course_id of quiz
+    const getCourseQuery = `
+      SELECT course_id FROM quizzes WHERE id = ?
     `;
 
-    db.query(query, [quiz_id], (err, questions) => {
-      if (err) {
-        console.log("FETCH ERROR:", err);
-        return res.status(500).json(err);
-      }
+    db.query(getCourseQuery, [quiz_id], (err, quizResult) => {
+      if (err) return res.status(500).json(err);
 
-      let score = 0;
+      const courseId = quizResult[0].course_id;
 
-      questions.forEach((q) => {
-        if (answers[q.id] === q.correct_option) {
-          score++;
-        }
-      });
-
-      // 🔥 INSERT INTO NEW TABLE (IMPORTANT FIX)
-      const insertQuery = `
-        INSERT INTO quiz_submissions (quiz_id, student_id, score)
-        VALUES (?, ?, ?)
+      // 🔥 Check enrollment
+      const checkEnrollQuery = `
+        SELECT * FROM course_enrollments 
+        WHERE student_id = ? AND course_id = ?
       `;
 
-      db.query(insertQuery, [quiz_id, user.id, score], (err2) => {
-        if (err2) {
-          console.log("INSERT ERROR:", err2); // 🔥 debug
-          return res.status(500).json(err2);
+      db.query(checkEnrollQuery, [user.id, courseId], (err2, enrollResult) => {
+        if (err2) return res.status(500).json(err2);
+
+        if (enrollResult.length === 0) {
+          return res.status(403).json({ message: "Not enrolled in this course" });
         }
 
-        res.json({
-          message: "Quiz submitted successfully",
-          score,
+        // 🔥 Continue original logic
+        const query = `
+          SELECT id, correct_option 
+          FROM questions 
+          WHERE quiz_id = ?
+        `;
+
+        db.query(query, [quiz_id], (err3, questions) => {
+          if (err3) return res.status(500).json(err3);
+
+          let score = 0;
+
+          questions.forEach((q) => {
+            if (answers[q.id] === q.correct_option) {
+              score++;
+            }
+          });
+
+          const insertQuery = `
+            INSERT INTO quiz_submissions (quiz_id, student_id, score)
+            VALUES (?, ?, ?)
+          `;
+
+          db.query(insertQuery, [quiz_id, user.id, score], (err4) => {
+            if (err4) return res.status(500).json(err4);
+
+            res.json({
+              message: "Quiz submitted successfully",
+              score,
+            });
+          });
         });
       });
     });
 
   } catch (err) {
-    console.log("JWT ERROR:", err);
     res.status(401).json({ message: "Invalid token" });
   }
 });
@@ -382,30 +579,44 @@ app.post("/api/assignments", async (req, res) => {
       return res.status(403).json({ message: "Only teachers can create assignments" });
     }
 
-    const { title, description, due_date, file_url } = req.body;
+    const { title, description, due_date, file_url, course_id } = req.body;
 
-    if (!title || !file_url) {
-      return res.status(400).json({ message: "Title and file required" });
+    if (!title || !file_url || !course_id) {
+      return res.status(400).json({ message: "Title, file and course_id required" });
     }
 
-    const query = `
-      INSERT INTO assignments (title, description, file_url, teacher_id, department_id, due_date)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `;
+    // 🔥 CHECK: teacher owns course
+    const checkCourseQuery = `
+      SELECT * FROM courses WHERE id = ? AND teacher_id = ?
+   `;
 
-    db.query(
-      query,
-      [title, description, file_url, user.id, user.department_id, due_date],
-      (err, result) => {
-        if (err) return res.status(500).json(err);
+    db.query(checkCourseQuery, [course_id, user.id], (err, courseResult) => {
+      if (err) return res.status(500).json(err);
 
-        res.json({
-          message: "Assignment created successfully",
-          assignmentId: result.insertId,
-          fileUrl: file_url,
-        });
+      if (courseResult.length === 0) {
+        return res.status(403).json({ message: "You don't own this course" });
       }
-    );
+
+      const insertQuery = `
+        INSERT INTO assignments 
+        (title, description, file_url, teacher_id, course_id, due_date)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `;
+
+      db.query(
+        insertQuery,
+        [title, description, file_url, user.id, course_id, due_date],
+        (err2, result) => {
+          if (err2) return res.status(500).json(err2);
+
+          res.json({
+            message: "Assignment created successfully",
+            assignmentId: result.insertId,
+            fileUrl: file_url,
+          });
+        }
+      );
+    });
 
   } catch (err) {
     console.log(err);
