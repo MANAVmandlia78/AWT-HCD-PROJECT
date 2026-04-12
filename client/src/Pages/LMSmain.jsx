@@ -2,6 +2,7 @@ import Sidebar from '../Components/Sidebar'
 import Maindashboard from '../Components/Maindashboard'
 import "../Styles/LMSmain.css"
 import Profile from "../Pages/ProfilePage"
+import { Outlet } from "react-router-dom";
 // import QuizPage from '../Components/Quiz'
 import React from 'react'
 import Calendar from '../Components/Calendar'
@@ -18,7 +19,9 @@ const LMSmain = () => {
   return (
     <div className="lms-layout">
         <Sidebar></Sidebar>
-        <Maindashboard></Maindashboard>
+        <Outlet />
+  
+        {/* <Maindashboard></Maindashboard> */}
         {/* <TeacherCourses></TeacherCourses> */}
         {/* <EnrollCourse></EnrollCourse> */}
         {/* <CourseDetail></CourseDetail> */}

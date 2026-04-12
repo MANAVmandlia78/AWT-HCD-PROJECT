@@ -1,5 +1,5 @@
 import React from "react";
-
+import { useNavigate } from "react-router-dom";
 // Accent colors cycling through the same palette as profile info rows
 const ACCENT_COLORS = [
   { stripe: "#ff6b9d", hover: "#fff5f9" }, // pink
@@ -11,9 +11,16 @@ const ACCENT_COLORS = [
 
 const CourseCard = ({ course, index = 0 }) => {
   const accent = ACCENT_COLORS[index % ACCENT_COLORS.length];
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate(`/course/${course.id}`); // 🔥 IMPORTANT
+  };
+
 
   return (
     <div
+      onClick={handleClick}
       style={{
         width: "300px",
         height: "320px",

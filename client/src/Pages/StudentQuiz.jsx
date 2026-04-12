@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import "../Styles/studentquiz.css";
-import Sidebar from '../Components/Sidebar';
+
 
 const StudentQuiz = () => {
   const { id } = useParams();
@@ -68,10 +68,7 @@ const StudentQuiz = () => {
   };
 
   return (
-    <div>
-      <Sidebar />
       <div className="studentquiz-container">
-
         {/* Ambient gradient blob */}
         <div className="gradient-mid" />
 
@@ -143,7 +140,6 @@ const StudentQuiz = () => {
         )}
 
       </div>
-    </div>
   );
 };
 

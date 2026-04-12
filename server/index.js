@@ -245,6 +245,32 @@ app.post("/api/courses/enroll", (req, res) => {
     res.status(401).json({ message: "Invalid token" });
   }
 });
+app.get("/api/courses/:id", (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
+    const user = jwt.verify(token, process.env.JWT_SECRET);
+
+    const courseId = req.params.id;
+
+    const query = `
+      SELECT 
+        courses.*,
+        users.name AS teacher_name
+      FROM courses
+      JOIN users ON courses.teacher_id = users.id
+      WHERE courses.id = ?
+    `;
+
+    db.query(query, [courseId], (err, result) => {
+      if (err) return res.status(500).json(err);
+
+      res.json(result[0]);
+    });
+
+  } catch (err) {
+    res.status(401).json({ message: "Invalid token" });
+  }
+});
 app.put("/api/submissions/:id", (req, res) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
@@ -397,34 +423,98 @@ app.post("/api/quizzes", async (req, res) => {
   }
 });
 
-app.get("/api/quizzes/:courseId", (req, res) => {
-  try {
-    const token = req.headers.authorization?.split(" ")[1];
-    const user = jwt.verify(token, process.env.JWT_SECRET);
+// app.get("/api/quizzes/:courseId", (req, res) => {
+//   try {
+//     const token = req.headers.authorization?.split(" ")[1];
+//     const user = jwt.verify(token, process.env.JWT_SECRET);
 
-    const courseId = req.params.courseId;
+//     const courseId = req.params.courseId;
 
-    const query = `
-      SELECT quizzes.*, users.name AS teacher_name
-      FROM quizzes
-      JOIN users ON quizzes.teacher_id = users.id
-      WHERE quizzes.course_id = ?
-      ORDER BY quizzes.created_at DESC
-    `;
+//     const query = `
+//       SELECT quizzes.*, users.name AS teacher_name
+//       FROM quizzes
+//       JOIN users ON quizzes.teacher_id = users.id
+//       WHERE quizzes.course_id = ?
+//       ORDER BY quizzes.created_at DESC
+//     `;
 
-    db.query(query, [courseId], (err, result) => {
-      if (err) return res.status(500).json(err);
+//     db.query(query, [courseId], (err, result) => {
+//       if (err) return res.status(500).json(err);
 
-      res.json(result);
-    });
+//       res.json(result);
+//     });
 
-  } catch (err) {
-    res.status(401).json({ message: "Invalid token" });
-  }
+//   } catch (err) {
+//     res.status(401).json({ message: "Invalid token" });
+//   }
+// });
+
+// ✅ GET questions of a quiz
+// app.get("/api/quizzes/:quizId", (req, res) => {
+//   const quizId = req.params.quizId;
+
+//   const query = `
+//     SELECT 
+//       id,
+//       question_text,
+//       option_a,
+//       option_b,
+//       option_c,
+//       option_d
+//     FROM questions
+//     WHERE quiz_id = ?
+//   `;
+
+//   db.query(query, [quizId], (err, result) => {
+//     if (err) return res.status(500).json(err);
+//     res.json(result);
+//   });
+// });
+
+// app.get("/api/quizzes/:id", (req, res) => {
+//   const quizId = req.params.id;
+
+//   const query = `
+//     SELECT 
+//       id,
+//       question_text,
+//       option_a,
+//       option_b,
+//       option_c,
+//       option_d
+//     FROM questions
+//     WHERE quiz_id = ?
+//   `;
+
+//   db.query(query, [quizId], (err, result) => {
+//     if (err) return res.status(500).json(err);
+
+//     res.json(result);
+//   });
+// });
+// ✅ 1. GET quizzes by course
+// ✅ 1. GET quizzes by course
+app.get("/api/quizzes/course/:courseId", (req, res) => {
+  const courseId = req.params.courseId;
+
+  const query = `
+    SELECT quizzes.*, users.name AS teacher_name
+    FROM quizzes
+    JOIN users ON quizzes.teacher_id = users.id
+    WHERE quizzes.course_id = ?
+    ORDER BY quizzes.created_at DESC
+  `;
+
+  db.query(query, [courseId], (err, result) => {
+    if (err) return res.status(500).json(err);
+    res.json(result);
+  });
 });
 
-app.get("/api/quizzes/:id", (req, res) => {
-  const quizId = req.params.id;
+
+// ✅ 2. GET quiz questions
+app.get("/api/quizzes/:quizId", (req, res) => {
+  const quizId = req.params.quizId;
 
   const query = `
     SELECT 
@@ -440,11 +530,39 @@ app.get("/api/quizzes/:id", (req, res) => {
 
   db.query(query, [quizId], (err, result) => {
     if (err) return res.status(500).json(err);
-
     res.json(result);
   });
 });
 
+
+// ✅ 3. GET result
+app.get("/api/quizzes/:quizId/result", (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
+    const user = jwt.verify(token, process.env.JWT_SECRET);
+
+    const quizId = req.params.quizId;
+
+    const query = `
+      SELECT score 
+      FROM quiz_submissions
+      WHERE quiz_id = ? AND student_id = ?
+    `;
+
+    db.query(query, [quizId, user.id], (err, result) => {
+      if (err) return res.status(500).json(err);
+
+      if (result.length > 0) {
+        res.json({ attempted: true, score: result[0].score });
+      } else {
+        res.json({ attempted: false });
+      }
+    });
+
+  } catch (err) {
+    res.status(401).json({ message: "Invalid token" });
+  }
+});
 app.post("/api/quizzes/submit", (req, res) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];

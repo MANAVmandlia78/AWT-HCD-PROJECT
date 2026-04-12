@@ -2,6 +2,7 @@
 .studentquiz-container {
   margin-left: var(--sidebar-width);
   min-height: 100vh;
+  width: 82vw;
   background: #fafafa;
   padding: 40px 32px;
   position: relative;

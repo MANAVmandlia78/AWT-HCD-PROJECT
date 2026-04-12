@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom"; // 🔥 added useParams
 
 import { storage } from "../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -8,12 +8,11 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import "../Styles/TeacherAssignments.css";
 
 const TeacherAssignments = () => {
+  const { id } = useParams(); // 🔥 courseId
   const [assignments, setAssignments] = useState([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [file, setFile] = useState(null);
-
-  // 🔥 NEW STATE FOR DATE
   const [dueDate, setDueDate] = useState("");
 
   const navigate = useNavigate();
@@ -21,15 +20,25 @@ const TeacherAssignments = () => {
 
   useEffect(() => {
     fetchAssignments();
-  }, []);
+  }, [id]);
 
+  // ✅ FIXED GET API
   const fetchAssignments = async () => {
-    const res = await axios.get("http://localhost:8000/api/assignments", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    setAssignments(res.data);
+    try {
+      const res = await axios.get(
+        `http://localhost:8000/api/assignments/${id}`, // 🔥 FIXED
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      setAssignments(res.data);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
+  // ✅ FIXED POST API
   const handleCreateAssignment = async () => {
     try {
       if (!title || !file) {
@@ -37,21 +46,24 @@ const TeacherAssignments = () => {
         return;
       }
 
-      // 🔥 Upload to Firebase
+      // 🔥 Upload file
       const storageRef = ref(storage, `assignments/${Date.now()}_${file.name}`);
       await uploadBytes(storageRef, file);
       const fileUrl = await getDownloadURL(storageRef);
 
-      // 🔥 Send due_date also
+      // 🔥 SEND course_id
       await axios.post(
         "http://localhost:8000/api/assignments",
         {
           title,
           description,
           file_url: fileUrl,
-          due_date: dueDate, // ✅ NEW
+          due_date: dueDate,
+          course_id: id, // 🔥 VERY IMPORTANT
         },
-        { headers: { Authorization: `Bearer ${token}` } }
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
       );
 
       alert("Assignment created ✅");
@@ -62,7 +74,7 @@ const TeacherAssignments = () => {
       setFile(null);
       setDueDate("");
 
-      fetchAssignments();
+      fetchAssignments(); // refresh
     } catch (err) {
       console.log(err);
       alert("Failed to create assignment ❌");
@@ -73,7 +85,7 @@ const TeacherAssignments = () => {
     <div className="teacher-assignments-container">
       <h2 className="title">Your Assignments</h2>
 
-      {/* ── CREATE FORM ── */}
+      {/* CREATE FORM */}
       <div className="create-assignment-card">
         <div className="card-header">Create Assignment</div>
 
@@ -91,7 +103,6 @@ const TeacherAssignments = () => {
             onChange={(e) => setDescription(e.target.value)}
           />
 
-          {/* 🔥 DATE PICKER */}
           <input
             type="date"
             value={dueDate}
@@ -118,7 +129,7 @@ const TeacherAssignments = () => {
         </div>
       </div>
 
-      {/* ── EXISTING ASSIGNMENTS ── */}
+      {/* ASSIGNMENTS LIST */}
       <div className="assignments-list-section">
         <div className="section-header">All Assignments</div>
 
@@ -132,7 +143,6 @@ const TeacherAssignments = () => {
 
                 {a.description && <p>{a.description}</p>}
 
-                {/* 🔥 SHOW DUE DATE */}
                 {a.due_date && (
                   <p className="due-date">
                     📅 Due: {new Date(a.due_date).toLocaleDateString()}

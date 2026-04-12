@@ -1,15 +1,27 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useParams } from "react-router-dom"; // 🔥 IMPORTANT
+
 import "../Styles/teacherquiz.css";
 
 const TeacherQuiz = () => {
+  const { id } = useParams(); // 🔥 courseId
+
   const [title, setTitle] = useState("");
   const [numQuestions, setNumQuestions] = useState(10);
   const [questions, setQuestions] = useState([]);
 
+  const token = localStorage.getItem("token");
+
+  // 🔥 initialize questions
+  useEffect(() => {
+    handleNumChange(10);
+  }, []);
+
   const handleNumChange = (value) => {
     const count = parseInt(value);
     setNumQuestions(count);
+
     const newQuestions = Array.from({ length: count }, () => ({
       question: "",
       optionA: "",
@@ -18,12 +30,9 @@ const TeacherQuiz = () => {
       optionD: "",
       correct: "A",
     }));
+
     setQuestions(newQuestions);
   };
-
-  useEffect(() => {
-    handleNumChange(10);
-  }, []);
 
   const handleChange = (index, field, value) => {
     const updated = [...questions];
@@ -31,30 +40,48 @@ const TeacherQuiz = () => {
     setQuestions(updated);
   };
 
+  // ✅ FIXED SUBMIT
   const handleSubmit = async () => {
     try {
-      const token = localStorage.getItem("token");
+      if (!title || questions.length === 0) {
+        alert("Please fill all required fields");
+        return;
+      }
+
       await axios.post(
         "http://localhost:8000/api/quizzes",
-        { title, questions },
-        { headers: { Authorization: `Bearer ${token}` } }
+        {
+          title,
+          questions,
+          course_id: id, // 🔥 VERY IMPORTANT
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
+
       alert("Quiz created successfully ✅");
+
+      // 🔥 reset
+      setTitle("");
+      handleNumChange(10);
+
     } catch (err) {
       console.log(err);
-      alert("Failed to create quiz ❌");
+      alert(err.response?.data?.message || "Failed to create quiz ❌");
     }
   };
 
   return (
     <div className="teacherquiz-container">
 
-      {/* Ambient gradient blob */}
       <div className="gradient-mid" />
 
       <span className="teacherquiz-title">Create Quiz</span>
 
-      {/* ── Config Card ── */}
+      {/* CONFIG */}
       <div className="teacherquiz-config">
         <div className="teacherquiz-config-topbar">
           <span className="teacherquiz-config-label">Quiz Settings</span>
@@ -72,7 +99,9 @@ const TeacherQuiz = () => {
           </div>
 
           <div className="teacherquiz-field">
-            <label className="teacherquiz-field-label">Number of Questions</label>
+            <label className="teacherquiz-field-label">
+              Number of Questions
+            </label>
             <select
               className="teacherquiz-select"
               value={numQuestions}
@@ -86,13 +115,15 @@ const TeacherQuiz = () => {
         </div>
       </div>
 
-      {/* ── Question Cards ── */}
+      {/* QUESTIONS */}
       <div className="teacherquiz-questions">
         {questions.map((q, index) => (
           <div key={index} className="question-card">
 
             <div className="question-card-topbar">
-              <span className="question-card-label">Question {index + 1}</span>
+              <span className="question-card-label">
+                Question {index + 1}
+              </span>
             </div>
 
             <div className="question-card-body">
@@ -102,19 +133,27 @@ const TeacherQuiz = () => {
                 <input
                   placeholder="Enter question"
                   value={q.question}
-                  onChange={(e) => handleChange(index, "question", e.target.value)}
+                  onChange={(e) =>
+                    handleChange(index, "question", e.target.value)
+                  }
                 />
               </div>
 
               <div className="options-grid">
                 {["A", "B", "C", "D"].map((opt) => (
                   <div className="question-field" key={opt}>
-                    <label className="question-field-label">Option {opt}</label>
+                    <label className="question-field-label">
+                      Option {opt}
+                    </label>
                     <input
                       placeholder={`Option ${opt}`}
                       value={q[`option${opt}`]}
                       onChange={(e) =>
-                        handleChange(index, `option${opt}`, e.target.value)
+                        handleChange(
+                          index,
+                          `option${opt}`,
+                          e.target.value
+                        )
                       }
                     />
                   </div>
@@ -122,13 +161,19 @@ const TeacherQuiz = () => {
               </div>
 
               <div className="question-field correct-field">
-                <label className="question-field-label">Correct Answer</label>
+                <label className="question-field-label">
+                  Correct Answer
+                </label>
                 <select
                   value={q.correct}
-                  onChange={(e) => handleChange(index, "correct", e.target.value)}
+                  onChange={(e) =>
+                    handleChange(index, "correct", e.target.value)
+                  }
                 >
                   {["A", "B", "C", "D"].map((opt) => (
-                    <option key={opt} value={opt}>Option {opt}</option>
+                    <option key={opt} value={opt}>
+                      Option {opt}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -138,7 +183,7 @@ const TeacherQuiz = () => {
         ))}
       </div>
 
-      {/* ── Submit ── */}
+      {/* SUBMIT */}
       <button className="teacherquiz-submit" onClick={handleSubmit}>
         Create Quiz
       </button>

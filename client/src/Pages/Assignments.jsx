@@ -5,21 +5,29 @@ import "../Styles/assignments.css";
 import { storage } from "../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
+import { useParams } from "react-router-dom"; // 🔥 ADD THIS
+
 const Assignments = () => {
+  const { id } = useParams(); // 🔥 courseId
+
   const [assignments, setAssignments] = useState([]);
   const token = localStorage.getItem("token");
 
   useEffect(() => {
     fetchAssignments();
-  }, []);
+  }, [id]);
 
+  // ✅ FIXED API CALL
   const fetchAssignments = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/api/assignments", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await axios.get(
+        `http://localhost:8000/api/assignments/${id}`, // 🔥 FIX
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       setAssignments(res.data);
     } catch (err) {
@@ -89,7 +97,6 @@ const Assignments = () => {
 
       {data.map((a) => (
         <div key={a.id} className="assignment-row">
-
           <div className="assignment-info">
             <h4>{a.title}</h4>
             <p>{a.description}</p>
@@ -108,7 +115,6 @@ const Assignments = () => {
               }
             />
           </div>
-
         </div>
       ))}
     </div>

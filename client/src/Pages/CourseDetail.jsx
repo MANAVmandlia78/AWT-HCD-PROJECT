@@ -1,35 +1,136 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "../Styles/courseDetail.css";
+import axios from "axios";
+import { useParams, useNavigate } from "react-router-dom";
 
 const CourseDetail = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+
+  const [course, setCourse] = useState(null);
+  const [role, setRole] = useState(null);
+
+  const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    fetchCourse();
+    fetchUser();
+  }, [id]);
+
+  // FETCH COURSE
+  const fetchCourse = async () => {
+    try {
+      const res = await axios.get(
+        `http://localhost:8000/api/courses/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setCourse(res.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // FETCH USER ROLE
+  const fetchUser = async () => {
+    try {
+      const res = await axios.get(
+        "http://localhost:8000/api/auth/me",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log("USER ROLE:", res.data.role);
+      setRole(res.data.role);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // ✅ FIXED CLICK HANDLER
+  const handleFeatureClick = (title) => {
+    if (!role) {
+      alert("User role not loaded yet");
+      return;
+    }
+
+    // 🔥 ASSIGNMENTS
+    if (title === "Assignments") {
+      if (role === "teacher") {
+        navigate(`/teacher-assignments/${id}`);
+      } else {
+        navigate(`/assignments/${id}`);
+      }
+    }
+
+    // 🔥 QUIZZES (FIXED)
+    if (title === "Quizzes") {
+      if (role === "teacher") {
+        navigate(`/teacher-quiz/${id}`);
+      } else {
+        navigate(`/quizzes/${id}`);
+      }
+    }
+
+     if (title === "Live Classes") {
+    navigate("/home");
+  }
+  };
+
+  if (!course) return <p>Loading...</p>;
+
   const features = [
-    { title: "Assignments", desc: "View and submit tasks", image: "/assigment-image.png" },
-    { title: "Quizzes", desc: "Test your knowledge", image: "/quiz-image.png" },
-    { title: "Live Classes", desc: "Join live sessions", image: "/live-image.png" },
-    { title: "Announcements", desc: "Latest updates", image: "/announcement-image.png" },
+    {
+      title: "Assignments",
+      desc: "View and submit tasks",
+      image: "/assigment-image.png",
+    },
+    {
+      title: "Quizzes",
+      desc: "Test your knowledge",
+      image: "/quiz-image.png",
+    },
+    {
+      title: "Live Classes",
+      desc: "Join live sessions",
+      image: "/live-image.png",
+    },
+    {
+      title: "Announcements",
+      desc: "Latest updates",
+      image: "/announcement-image.png",
+    },
   ];
 
   return (
     <div className="course-detail">
 
-      {/* Ambient gradient blob */}
       <div className="gradient-mid" />
 
       {/* HEADER */}
       <div className="course-header">
         <div className="course-header-left">
-          <h1>Database Management System</h1>
-          <p className="instructor">By Prof. Sharma</p>
-          <p className="course-desc">
-            Learn the fundamentals of database systems, SQL, and data modeling.
-          </p>
+          <h1>{course.title}</h1>
+          <p className="instructor">By {course.teacher_name}</p>
+          <p className="course-desc">{course.description}</p>
         </div>
       </div>
 
       {/* FEATURES */}
       <div className="feature-grid">
         {features.map((item, index) => (
-          <div key={index} className="feature-card">
+          <div
+            key={index}
+            className="feature-card"
+            onClick={() => handleFeatureClick(item.title)}
+            style={{ cursor: "pointer" }}
+          >
             <div className="feature-image">
               <img src={item.image} alt={item.title} />
             </div>
@@ -43,9 +144,9 @@ const CourseDetail = () => {
       <div className="activity-section">
         <h3>Recent Activity</h3>
         <ul>
-          <li>Assignment 1 uploaded</li>
-          <li>Quiz scheduled for tomorrow</li>
-          <li>Live class at 5 PM</li>
+          <li>Assignment uploaded</li>
+          <li>Quiz scheduled</li>
+          <li>Live class upcoming</li>
         </ul>
       </div>
 

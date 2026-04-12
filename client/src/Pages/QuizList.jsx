@@ -1,24 +1,29 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import "../Styles/quizlist.css";
 
 const QuizList = () => {
+  const { id } = useParams(); // 🔥 courseId
   const [quizzes, setQuizzes] = useState([]);
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
   useEffect(() => {
     fetchQuizzes();
-  }, []);
+  }, [id]);
 
   const fetchQuizzes = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/api/quizzes", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await axios.get(
+        `http://localhost:8000/api/quizzes/course/${id}`, // 🔥 FIXED
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
       setQuizzes(res.data);
     } catch (err) {
       console.log(err);
@@ -36,12 +41,10 @@ const QuizList = () => {
           {quizzes.map((quiz) => (
             <div key={quiz.id} className="quiz-card">
 
-              {/* ── Topbar ── */}
               <div className="quiz-card-topbar">
                 <span className="quiz-card-label">Quiz</span>
               </div>
 
-              {/* ── Body ── */}
               <div className="quiz-card-body">
                 <h3 className="quiz-card-title">{quiz.title}</h3>
 
@@ -56,7 +59,6 @@ const QuizList = () => {
                 </div>
               </div>
 
-              {/* ── Footer ── */}
               <div className="quiz-card-footer">
                 <button
                   className="quiz-attempt-btn"

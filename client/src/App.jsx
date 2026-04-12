@@ -6,11 +6,22 @@ import Room from "./Pages/Room";
 import LMSmain from "./Pages/LMSmain";
 import Login from "./Pages/Login";
 import Signup from "./Pages/Signup";
-import Submissions from "./Pages/Submissions"; // 🔥 ADD THIS
+import Submissions from "./Pages/Submissions";
+import StudentQuiz from "./Pages/StudentQuiz";
+import QuizList from "./Pages/QuizList";
+import CourseDetail from "./Pages/CourseDetail";
+import Maindashboard from "./Components/Maindashboard";
+
+// 🔥 ASSIGNMENTS
+import Assignments from "./Pages/Assignments";
+import TeacherAssignments from "./Pages/TeacherAssignments";
+
+// 🔥 ADD THIS
+import TeacherQuiz from "./Pages/TeacherQuiz";
+
 import { SocketProvider } from "./Providers/Socket";
 import { PeerProvider } from "./Providers/Peer";
-import StudentQuiz from './Pages/StudentQuiz'
-import QuizList from "./Pages/QuizList";
+
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
 
@@ -20,7 +31,7 @@ const App = () => {
       <PeerProvider>
         <Routes>
 
-          {/* PUBLIC */}
+          {/* ================= PUBLIC ================= */}
           <Route
             path="/login"
             element={
@@ -31,15 +42,6 @@ const App = () => {
           />
 
           <Route
-  path="/quizzes"
-  element={
-    <ProtectedRoute>
-      <QuizList />
-    </ProtectedRoute>
-  }
-/>
-
-          <Route
             path="/signup"
             element={
               <PublicRoute>
@@ -48,21 +50,40 @@ const App = () => {
             }
           />
 
+          {/* ================= PROTECTED LAYOUT ================= */}
           <Route
-  path="/submissions/:id"
-  element={
-    <ProtectedRoute>
-      <Submissions />
-    </ProtectedRoute>
-  }
-/>
-
-          {/* PROTECTED */}
-          <Route
-            path="/dashboard"
+            path="/"
             element={
               <ProtectedRoute>
                 <LMSmain />
+              </ProtectedRoute>
+            }
+          >
+            {/* DASHBOARD */}
+            <Route path="dashboard" element={<Maindashboard />} />
+
+            {/* COURSE */}
+            <Route path="course/:id" element={<CourseDetail />} />
+
+            {/* ASSIGNMENTS */}
+            <Route path="assignments/:id" element={<Assignments />} />
+            <Route path="teacher-assignments/:id" element={<TeacherAssignments />} />
+
+            {/* 🔥 QUIZ FIXED */}
+            <Route path="quiz/:id" element={<StudentQuiz />} />
+            <Route path="quizzes/:id" element={<QuizList />} /> {/* ✅ FIXED */}
+            <Route path="teacher-quiz/:id" element={<TeacherQuiz />} /> {/* ✅ ADDED */}
+
+            {/* SUBMISSIONS */}
+            <Route path="submissions/:id" element={<Submissions />} />
+          </Route>
+
+          {/* OTHER PROTECTED */}
+          <Route
+            path="/room/:roomId"
+            element={
+              <ProtectedRoute>
+                <Room />
               </ProtectedRoute>
             }
           />
@@ -76,26 +97,8 @@ const App = () => {
             }
           />
 
-          <Route
-  path="/quiz/:id"
-  element={
-    <ProtectedRoute>
-      <StudentQuiz />
-    </ProtectedRoute>
-  }
-/>
-
-          <Route
-            path="/room/:roomId"
-            element={
-              <ProtectedRoute>
-                <Room />
-              </ProtectedRoute>
-            }
-          />
-
           {/* DEFAULT */}
-          <Route path="/" element={<Navigate to="/login" />} />
+          <Route path="/" element={<Navigate to="/dashboard" />} />
 
         </Routes>
       </PeerProvider>
