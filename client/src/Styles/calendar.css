@@ -12,6 +12,17 @@
   min-height: 100vh;
 }
 
+.subject {
+  font-size: 10px;
+  font-weight: 900;
+  color: #333;
+}
+
+.assignment-title {
+  font-size: 9px;
+  font-weight: 600;
+}
+
 /* HEADER */
 .calendar-header {
   display: flex;

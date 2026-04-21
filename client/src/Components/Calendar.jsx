@@ -1,34 +1,70 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "../Styles/calendar.css";
 import { ImCalendar } from "react-icons/im";
+import axios from "axios";
+
 const Calendar = () => {
   const today = new Date();
+  const [assignments, setAssignments] = useState([]);
 
-  const assignments = [
-    { title: "DBMS Assignment", date: "2026-03-25" },
-    { title: "OS Submission", date: "2026-03-28" },
-    { title: "AI Project", date: "2026-04-02" },
-  ];
+  const token = localStorage.getItem("token");
 
+  useEffect(() => {
+    fetchAssignments();
+  }, []);
+
+  const fetchAssignments = async () => {
+    try {
+      const res = await axios.get(
+        "http://localhost:8000/api/student/assignments",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setAssignments(res.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // ✅ STATUS LOGIC
   const getStatus = (date) => {
     const d = new Date(date);
-    if (d.toDateString() === today.toDateString()) return "today";
-    if (d < today) return "past";
+    const t = new Date();
+
+    d.setHours(0, 0, 0, 0);
+    t.setHours(0, 0, 0, 0);
+
+    if (d.getTime() === t.getTime()) return "today";
+    if (d < t) return "past";
     return "future";
   };
 
+  // ✅ CURRENT MONTH
+  const currentMonth = today.getMonth();
+  const currentYear = today.getFullYear();
+
+  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+  const startDay = new Date(currentYear, currentMonth, 1).getDay();
+
   const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  const days = Array.from({ length: 30 }, (_, i) => i + 1);
-  const startDay = new Date("2026-03-01").getDay();
+
   const blanks = Array.from({ length: startDay }, (_, i) => i);
+  const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
   return (
     <div className="calendar-container">
 
+      {/* HEADER */}
       <div className="calendar-header">
-        <h2 style={{
-        display: "flex",
-        gap: "15px",}}><ImCalendar /> March 2026</h2>
+        <h2 style={{ display: "flex", gap: "15px" }}>
+          <ImCalendar />
+          {today.toLocaleString("default", { month: "long" })} {currentYear}
+        </h2>
+
         <div className="legend">
           <span className="legend-item today-legend">Today</span>
           <span className="legend-item past-legend">Past</span>
@@ -36,29 +72,59 @@ const Calendar = () => {
         </div>
       </div>
 
+      {/* WEEK DAYS */}
       <div className="weekday-row">
         {weekDays.map((d) => (
           <div key={d} className="weekday-label">{d}</div>
         ))}
       </div>
 
+      {/* GRID */}
       <div className="calendar-grid">
+
+        {/* BLANK DAYS */}
         {blanks.map((b) => (
           <div key={`blank-${b}`} className="day-box blank" />
         ))}
 
+        {/* ACTUAL DAYS */}
         {days.map((day) => {
-          const fullDate = `2026-03-${String(day).padStart(2, "0")}`;
-          const assignment = assignments.find((a) => a.date === fullDate);
-          const status = assignment ? getStatus(fullDate) : "none";
+          const fullDate = new Date(currentYear, currentMonth, day)
+            .toISOString()
+            .split("T")[0];
+
+          // ✅ FILTER ASSIGNMENTS FOR THAT DAY
+          const dayAssignments = assignments.filter(
+            (a) =>
+              new Date(a.due_date).toISOString().split("T")[0] === fullDate
+          );
+
+          // ✅ REMOVE DUPLICATE SUBJECTS
+          const uniqueSubjects = [
+            ...new Set(dayAssignments.map((a) => a.course_name)),
+          ];
+
+          const status =
+            dayAssignments.length > 0
+              ? getStatus(dayAssignments[0].due_date)
+              : "none";
 
           return (
             <div key={day} className={`day-box ${status}`}>
               <div className="day-number">{day}</div>
-              {status === "today" && <span className="today-badge">TODAY</span>}
-              {assignment && (
-                <div className="assignment">{assignment.title}</div>
+
+              {status === "today" && (
+                <span className="today-badge">TODAY</span>
               )}
+
+              {/* ✅ SHOW ONLY SUBJECT NAMES */}
+              {uniqueSubjects.map((subject, index) => (
+                <div key={index} className="assignment">
+                  <div className="subject">
+                    {subject || "Unknown"}
+                  </div>
+                </div>
+              ))}
             </div>
           );
         })}

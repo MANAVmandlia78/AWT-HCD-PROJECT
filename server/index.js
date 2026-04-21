@@ -8,6 +8,23 @@ const io = new Server({ cors: true });
 const cors = require("cors");
 const app = express();
 const authRoutes = require("./routes/authRoutes");
+const verifyToken = (req, res, next) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
+
+    if (!token) {
+      return res.status(401).json({ message: "No token" });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    req.user = decoded; // 🔥 important
+
+    next();
+  } catch (err) {
+    return res.status(401).json({ message: "Invalid token" });
+  }
+};
 
 app.use(cors({
   origin: "http://localhost:5173",
@@ -652,7 +669,112 @@ app.get("/api/quizzes", (req, res) => {
     res.json(result);
   });
 });
-app.get("/api/quizzes/:id/result", (req, res) => {
+app.get("/api/student/assignments", async (req, res) => {
+  try {
+    const token = req.headers.authorization.split(" ")[1];
+    const user = jwt.verify(token, process.env.JWT_SECRET);
+
+    const query = `
+      SELECT 
+        a.id,
+        a.title,
+        a.due_date,
+        c.title AS course_name
+      FROM assignments a
+      JOIN course_enrollments ce 
+        ON ce.course_id = a.course_id
+      JOIN courses c 
+        ON c.id = a.course_id
+      WHERE ce.student_id = ?
+        AND a.course_id IS NOT NULL   -- 🔥 IMPORTANT FIX
+      ORDER BY a.due_date ASC
+    `;
+
+    db.query(query, [user.id], (err, result) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).json(err);
+      }
+
+      console.log("Assignments API:", result); // 🔥 DEBUG
+      res.json(result);
+    });
+
+  } catch (err) {
+    res.status(401).json({ message: "Unauthorized" });
+  }
+});
+
+app.post("/api/announcements", verifyToken, (req, res) => {
+  const user = req.user;
+
+  if (user.role !== "teacher") {
+    return res.status(403).json({ message: "Only teachers can post" });
+  }
+
+  const { title, message, course_id } = req.body;
+
+  const query = `
+    INSERT INTO announcements (title, message, teacher_id, course_id)
+    VALUES (?, ?, ?, ?)
+  `;
+
+  db.query(
+    query,
+    [title, message, user.id, course_id],
+    (err, result) => {
+      if (err) return res.status(500).json(err);
+
+      res.json({ message: "Announcement created successfully" });
+    }
+  );
+});
+
+app.get("/api/announcements", verifyToken, (req, res) => {
+  const user = req.user;
+
+  let query;
+
+  // 👨‍🎓 STUDENT
+  if (user.role === "student") {
+    query = `
+      SELECT a.*, u.name AS teacher_name, c.title AS course_name
+      FROM announcements a
+      JOIN users u ON a.teacher_id = u.id
+      JOIN courses c ON a.course_id = c.id
+      JOIN course_enrollments ce ON ce.course_id = c.id
+      WHERE ce.student_id = ?
+      ORDER BY a.created_at DESC
+    `;
+
+    db.query(query, [user.id], (err, result) => {
+      if (err) return res.status(500).json(err);
+      res.json(result);
+    });
+  }
+
+  // 👨‍🏫 TEACHER
+  else if (user.role === "teacher") {
+    query = `
+      SELECT a.*, c.title AS course_name
+      FROM announcements a
+      JOIN courses c ON a.course_id = c.id
+      WHERE a.teacher_id = ?
+      ORDER BY a.created_at DESC
+    `;
+
+    db.query(query, [user.id], (err, result) => {
+      if (err) return res.status(500).json(err);
+      res.json(result);
+    });
+  }
+
+  else {
+    res.status(403).json({ message: "Unauthorized" });
+  }
+});
+
+  app.get("/api/quizzes/:id/result", (req, res) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(401).json({ message: "No token" });
@@ -686,6 +808,7 @@ app.get("/api/quizzes/:id/result", (req, res) => {
     res.status(401).json({ message: "Invalid token" });
   }
 });
+
 app.post("/api/assignments", async (req, res) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];

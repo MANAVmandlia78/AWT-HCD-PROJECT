@@ -4,62 +4,36 @@ import "../Styles/assignments.css";
 
 import { storage } from "../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-
-import { useParams } from "react-router-dom"; // 🔥 ADD THIS
+import { useParams } from "react-router-dom";
 
 const Assignments = () => {
-  const { id } = useParams(); // 🔥 courseId
-
+  const { id } = useParams();
   const [assignments, setAssignments] = useState([]);
   const token = localStorage.getItem("token");
 
-  useEffect(() => {
-    fetchAssignments();
-  }, [id]);
+  useEffect(() => { fetchAssignments(); }, [id]);
 
-  // ✅ FIXED API CALL
   const fetchAssignments = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:8000/api/assignments/${id}`, // 🔥 FIX
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        `http://localhost:8000/api/assignments/${id}`,
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-
       setAssignments(res.data);
-    } catch (err) {
-      console.log(err);
-    }
+    } catch (err) { console.log(err); }
   };
 
   const handleSubmit = async (assignmentId, file) => {
     try {
       if (!file) return;
-
-      const storageRef = ref(
-        storage,
-        `submissions/${Date.now()}_${file.name}`
-      );
-
+      const storageRef = ref(storage, `submissions/${Date.now()}_${file.name}`);
       await uploadBytes(storageRef, file);
       const fileUrl = await getDownloadURL(storageRef);
-
       await axios.post(
         "http://localhost:8000/api/submissions",
-        {
-          assignment_id: assignmentId,
-          file_url: fileUrl,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { assignment_id: assignmentId, file_url: fileUrl },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-
       alert("Submitted successfully ✅");
     } catch (err) {
       console.log(err);
@@ -76,43 +50,34 @@ const Assignments = () => {
     return "upcoming";
   };
 
-  const grouped = {
-    overdue: [],
-    upcoming: [],
-    past: [],
-  };
+  const grouped = { overdue: [], upcoming: [], past: [] };
 
   assignments.forEach((a) => {
     const category = getCategory(a.due_date);
-
     if (category === "past") grouped.overdue.push(a);
-    else if (category === "today" || category === "upcoming")
-      grouped.upcoming.push(a);
+    else if (category === "today" || category === "upcoming") grouped.upcoming.push(a);
     else grouped.past.push(a);
   });
 
   const renderSection = (title, data) => (
     <div className="assignment-section">
       <h3>{title}</h3>
-
-      {data.map((a) => (
+      {data.length === 0 ? (
+        <p style={{ padding: "16px 24px", color: "#aaa", fontSize: "12px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+          No assignments here
+        </p>
+      ) : data.map((a) => (
         <div key={a.id} className="assignment-row">
           <div className="assignment-info">
             <h4>{a.title}</h4>
             <p>{a.description}</p>
             <span>Due: {a.due_date}</span>
           </div>
-
           <div className="assignment-actions">
-            <a href={a.file_url} target="_blank" rel="noreferrer">
-              View
-            </a>
-
+            <a href={a.file_url} target="_blank" rel="noreferrer">View</a>
             <input
               type="file"
-              onChange={(e) =>
-                handleSubmit(a.id, e.target.files[0])
-              }
+              onChange={(e) => handleSubmit(a.id, e.target.files[0])}
             />
           </div>
         </div>
@@ -122,11 +87,11 @@ const Assignments = () => {
 
   return (
     <div className="assignments-container">
+      <div className="gradient-mid" />
       <h2 className="title">Assignments</h2>
-
-      {renderSection("Overdue Assignments", grouped.overdue)}
-      {renderSection("Upcoming Assignments", grouped.upcoming)}
-      {renderSection("Past Assignments", grouped.past)}
+      {renderSection("Assignments", grouped.overdue)}
+      {/* {renderSection("Upcoming Assignments", grouped.upcoming)}
+      {renderSection("Past Assignments", grouped.past)} */}
     </div>
   );
 };

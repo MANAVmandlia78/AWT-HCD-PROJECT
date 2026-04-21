@@ -110,14 +110,14 @@
   margin-top: 6px;
   height: 4px;
   width: 100%;
-  background: linear-gradient(90deg, #ff6b9d, #6b8eff, #ffc96b, #6bddaa, #b06bff);
+  /* background: linear-gradient(90deg, #ff6b9d, #6b8eff, #ffc96b, #6bddaa, #b06bff); */
   border-radius: 2px;
 }
 
 .home-tagline {
   font-size: 15px;
   font-weight: 700;
-  color: #555;
+  color: #000000;
   letter-spacing: 0.02em;
   margin-top: -6px;
 }

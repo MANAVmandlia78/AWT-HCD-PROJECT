@@ -15,11 +15,17 @@ import StudentQuiz from './StudentQuiz'
 import QuizList from './QuizList'
 import TeacherCourses from '../Components/TeacherCourses'
 import EnrollCourse from '../Components/EnrollCourse'
+import StudentAnnouncements from '../Components/StudentAnnouncements';
+import TeacherAnnouncements from '../Components/TeacherAnnouncements';
 const LMSmain = () => {
   return (
     <div className="lms-layout">
         <Sidebar></Sidebar>
         <Outlet />
+        {/* <TeacherAnnouncements></TeacherAnnouncements> */}
+        {/* <StudentAnnouncements></StudentAnnouncements> */}
+        {/* <TeacherCourses/> */}
+        {/* < EnrollCourse/> */}
   
         {/* <Maindashboard></Maindashboard> */}
         {/* <TeacherCourses></TeacherCourses> */}

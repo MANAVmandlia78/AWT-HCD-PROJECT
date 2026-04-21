@@ -11,13 +11,17 @@ import StudentQuiz from "./Pages/StudentQuiz";
 import QuizList from "./Pages/QuizList";
 import CourseDetail from "./Pages/CourseDetail";
 import Maindashboard from "./Components/Maindashboard";
+import Profile from "./Pages/ProfilePage";
 
 // 🔥 ASSIGNMENTS
 import Assignments from "./Pages/Assignments";
 import TeacherAssignments from "./Pages/TeacherAssignments";
 
-// 🔥 ADD THIS
+// 🔥 QUIZ
 import TeacherQuiz from "./Pages/TeacherQuiz";
+
+// ✅ ADDED CALENDAR IMPORT
+import Calendar from "./Components/Calendar";
 
 import { SocketProvider } from "./Providers/Socket";
 import { PeerProvider } from "./Providers/Peer";
@@ -62,6 +66,10 @@ const App = () => {
             {/* DASHBOARD */}
             <Route path="dashboard" element={<Maindashboard />} />
 
+            {/* ✅ CALENDAR (ONLY ADDITION) */}
+            <Route path="calendar" element={<Calendar />} />
+            <Route path="profile" element={<Profile />} />
+
             {/* COURSE */}
             <Route path="course/:id" element={<CourseDetail />} />
 
@@ -69,10 +77,10 @@ const App = () => {
             <Route path="assignments/:id" element={<Assignments />} />
             <Route path="teacher-assignments/:id" element={<TeacherAssignments />} />
 
-            {/* 🔥 QUIZ FIXED */}
+            {/* QUIZ */}
             <Route path="quiz/:id" element={<StudentQuiz />} />
-            <Route path="quizzes/:id" element={<QuizList />} /> {/* ✅ FIXED */}
-            <Route path="teacher-quiz/:id" element={<TeacherQuiz />} /> {/* ✅ ADDED */}
+            <Route path="quizzes/:id" element={<QuizList />} />
+            <Route path="teacher-quiz/:id" element={<TeacherQuiz />} />
 
             {/* SUBMISSIONS */}
             <Route path="submissions/:id" element={<Submissions />} />
