@@ -121,6 +121,11 @@ app.post("/api/submissions", async (req, res) => {
   }
 });
 const crypto = require("crypto");
+
+function generateId() {
+  return crypto.randomBytes(6).toString("hex"); // e.g. "a1b2c3d4e5f6"
+}
+
 app.post("/api/courses", (req, res) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
@@ -140,7 +145,7 @@ app.post("/api/courses", (req, res) => {
     }
 
     // 🔥 Generate unique enrollment code
-    const enrollment_code = crypto.randomBytes(3).toString("hex"); 
+    const enrollment_code = crypto.randomBytes(3).toString("hex");
     // Example: a1b2c3
 
     const query = `
@@ -767,7 +772,7 @@ app.get("/api/announcements", verifyToken, (req, res) => {
   }
 });
 
-  app.get("/api/quizzes/:id/result", (req, res) => {
+app.get("/api/quizzes/:id/result", (req, res) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(401).json({ message: "No token" });
@@ -932,9 +937,11 @@ io.on('connection', (socket) => {
     socketToRoleMapping.set(socket.id, role);
     socketToRoomMapping.set(socket.id, roomId);
 
-    if (!rooms.has(roomId)) {
-      rooms.set(roomId, { participants: new Map(), currentSharerSocketId: null });
-    }
+    rooms.set(roomId, {
+      participants: new Map(),
+      currentSharerSocketId: null,
+      clipboardItems: [],
+    });
 
     const roomState = rooms.get(roomId);
     roomState.participants.set(socket.id, userId);
@@ -946,15 +953,19 @@ io.on('connection', (socket) => {
       participants: getParticipantsPayload(roomState),
       currentSharer: roomState.currentSharerSocketId
         ? {
-            socketId: roomState.currentSharerSocketId,
-            userId: roomState.participants.get(roomState.currentSharerSocketId),
-          }
+          socketId: roomState.currentSharerSocketId,
+          userId: roomState.participants.get(roomState.currentSharerSocketId),
+        }
         : null,
     });
 
     socket.broadcast.to(roomId).emit('participant-joined', {
       socketId: socket.id,
       userId
+    });
+
+    socket.emit("clipboard-init", {
+      items: roomState.clipboardItems,
     });
 
     io.to(roomId).emit('participants-update', {
@@ -975,9 +986,9 @@ io.on('connection', (socket) => {
       participants: getParticipantsPayload(roomState),
       currentSharer: roomState.currentSharerSocketId
         ? {
-            socketId: roomState.currentSharerSocketId,
-            userId: roomState.participants.get(roomState.currentSharerSocketId),
-          }
+          socketId: roomState.currentSharerSocketId,
+          userId: roomState.participants.get(roomState.currentSharerSocketId),
+        }
         : null,
     });
   });
@@ -1058,6 +1069,106 @@ io.on('connection', (socket) => {
       candidate
     });
   });
+
+  // ── CLIPBOARD: POST ITEM ─────────────────────────────────────────────────────
+  socket.on("clipboard-add", (data) => {
+    const roomId = socketToRoomMapping.get(socket.id);
+    if (!roomId) return;
+
+    const role = socketToRoleMapping.get(socket.id);
+    if (role !== "teacher") {
+      return socket.emit("clipboard-error", {
+        message: "Only teachers can post to the clipboard",
+      });
+    }
+
+    const roomState = rooms.get(roomId);
+    if (!roomState) return;
+
+    const { type, title, content, lang, dataUrl, ext, size } = data;
+
+    if (!type || !title || !["text", "file"].includes(type)) return;
+    if (type === "text" && !content) return;
+    if (type === "file" && !dataUrl) return;
+
+    const item = {
+      id: generateId(),
+      type,
+      title: String(title).slice(0, 120),
+      content: type === "text" ? String(content).slice(0, 8000) : "",
+      lang: lang || "plain",
+      dataUrl: type === "file" ? dataUrl : null,
+      ext: ext || "FILE",
+      size: size || "",
+      time: new Date().toLocaleTimeString("en-GB", { hour12: false }),
+      authorId: socketToUserMapping.get(socket.id),
+    };
+
+    roomState.clipboardItems.unshift(item);
+
+    // ✅ io.in includes the sender — teacher sees their own post
+    io.in(roomId).emit("clipboard-update", {
+      items: roomState.clipboardItems,
+    });
+  });
+
+
+  // ── CLIPBOARD: DELETE ITEM ───────────────────────────────────────────────────
+  socket.on("clipboard-delete", (data) => {
+    const roomId = socketToRoomMapping.get(socket.id);
+    if (!roomId) return;
+
+    const role = socketToRoleMapping.get(socket.id);
+    if (role !== "teacher") return;
+
+    const roomState = rooms.get(roomId);
+    if (!roomState) return;
+
+    const { id } = data;
+    if (!id) return;
+
+    roomState.clipboardItems = roomState.clipboardItems.filter(
+      (item) => item.id !== id
+    );
+
+    // ✅ io.in includes the sender
+    io.in(roomId).emit("clipboard-update", {
+      items: roomState.clipboardItems,
+    });
+  });
+
+
+  // ── CLIPBOARD: EDIT ITEM ─────────────────────────────────────────────────────
+  socket.on("clipboard-edit", (data) => {
+    const roomId = socketToRoomMapping.get(socket.id);
+    if (!roomId) return;
+
+    const role = socketToRoleMapping.get(socket.id);
+    if (role !== "teacher") return;
+
+    const roomState = rooms.get(roomId);
+    if (!roomState) return;
+
+    const { id, title, content } = data;
+    if (!id || !title || !content) return;
+
+    const item = roomState.clipboardItems.find((i) => i.id === id);
+
+    if (item && item.type === "text") {
+      item.title = String(title).slice(0, 120);
+      item.content = String(content).slice(0, 8000);
+
+      // ✅ io.in includes the sender
+      io.in(roomId).emit("clipboard-update", {
+        items: roomState.clipboardItems,
+      });
+    }
+  });
+
+  // NOTE: No changes needed to the disconnect handler.
+  // When all participants leave, rooms.delete(roomId) already runs (line 1044),
+  // which removes the entire room state including clipboardItems.
+  // Session cleanup is automatic — no extra code required.
 
   // 🔴 DISCONNECT
   socket.on('disconnect', () => {
