@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700;800&display=swap');
+@import url('[fonts.googleapis.com](https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700;800&display=swap)');
 
 * {
   font-family: 'Comic Neue', sans-serif;
@@ -70,7 +70,6 @@
   overflow: hidden;
 }
 
-/* Shimmer blobs inside topbar */
 .room-topbar::before {
   content: "";
   position: absolute;
@@ -95,7 +94,6 @@
   pointer-events: none;
 }
 
-/* Room ID label */
 .room-id-tag {
   font-size: 11px;
   font-weight: 800;
@@ -123,7 +121,6 @@
   border: 1.5px solid #000;
 }
 
-/* Participants pill */
 .room-participants-pill {
   font-size: 11px;
   font-weight: 800;
@@ -150,7 +147,6 @@
   border: 1.5px solid #000;
 }
 
-/* Sharer notice */
 .room-sharer-notice {
   font-size: 11px;
   font-weight: 800;
@@ -178,7 +174,6 @@
   border: 1.5px solid #000;
 }
 
-/* Share / Stop button */
 .room-share-btn {
   font-size: 11px;
   font-weight: 800;
@@ -210,7 +205,7 @@
   box-shadow: 5px 5px 0 #000;
 }
 
-/* ─── BODY (whiteboard left, screen right) ───────────── */
+/* ─── BODY ───────────────────────────────────────────── */
 .room-body {
   flex: 1;
   display: flex;
@@ -231,6 +226,7 @@
   min-width: 0;
 }
 
+/* ─── PANEL TOPBAR (shared by both sides) ────────────── */
 .room-panel-topbar {
   display: flex;
   align-items: center;
@@ -250,8 +246,26 @@
   flex-shrink: 0;
 }
 
-.room-whiteboard-panel .room-panel-topbar::before { background: #b06bff; }
-.room-screen-panel    .room-panel-topbar::before { background: #6b8eff; }
+/* Coloured dot: right panel defaults to purple, screen panel blue */
+.room-right-panel .room-panel-topbar::before {
+  background: #b06bff;
+}
+
+.room-screen-panel .room-panel-topbar::before {
+  background: #6b8eff;
+}
+
+/* Tab variant — no left dot, tabs are full-height */
+.room-panel-topbar--tabs {
+  padding: 0;
+  gap: 0;
+  align-items: stretch;
+}
+
+.room-panel-topbar--tabs::before {
+  display: none;
+  /* hide the coloured dot for the tab bar */
+}
 
 .room-panel-label {
   font-size: 10px;
@@ -261,13 +275,6 @@
   color: #000;
 }
 
-.room-whiteboard-content {
-  flex: 1;
-  display: flex;
-  align-items: stretch;
-  overflow: hidden;
-}
-
 /* ─── DIVIDER ────────────────────────────────────────── */
 .room-divider {
   width: 2px;
@@ -275,15 +282,61 @@
   flex-shrink: 0;
 }
 
-/* ─── RIGHT: WHITEBOARD ──────────────────────────────── */
-.room-whiteboard-panel {
+/* ─── RIGHT PANEL ────────────────────────────────────── */
+.room-right-panel {
   flex: 0 0 40%;
   width: 40%;
   display: flex;
   flex-direction: column;
   min-width: 0;
+  /* The tab bar is flex-shrink:0; the scroll area takes the remaining height */
 }
 
+/* ─── SCROLL CONTAINER (both axes) ──────────────────── */
+/*
+  This is the key layout change.
+  - flex: 1 + min-height: 0 lets it grow to fill remaining height
+  - overflow: auto on both axes makes it independently scrollable
+  - display: flex so child components can be naturally sized
+*/
+.room-panel-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  /* scroll both axes */
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* Clipboard scroll container — vertical scroll, natural width */
+.room-panel-scroll--clipboard {
+  overflow-x: hidden;
+  /* clipboard doesn't need horizontal scroll */
+  overflow-y: auto;
+}
+
+/* ─── WHITEBOARD INNER WRAPPER ───────────────────────
+   Whiteboard.jsx sets height:100vh on .wb-app.
+   Inside a scroll container we want it to show its full natural height
+   (so you can scroll to see the optbar etc.) but also fill width.      */
+.room-whiteboard-inner {
+  width: 100%;
+  /* min-height forces the scroll container to grow beyond its clipped height,
+     giving you a proper scrollbar to reveal the bottom toolbar */
+  min-height: 700px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Override wb-app's 100vh so it fills the scroll inner wrapper instead */
+.room-whiteboard-inner .wb-app {
+  height: 100%;
+  min-height: 700px;
+}
+
+/* ─── SCREEN CONTENT ─────────────────────────────────── */
 .room-screen-content {
   flex: 1;
   display: flex;
@@ -294,7 +347,6 @@
   overflow: hidden;
 }
 
-/* Video */
 .room-video {
   width: 100%;
   height: 100%;
@@ -302,10 +354,10 @@
   box-shadow: 4px 4px 0 #000;
   background: #000;
   display: block;
-  object-fit: fill;     /* ← KEY CHANGE: fills the entire box */
+  object-fit: fill;
   min-height: 0;
 }
-/* Empty screen state */
+
 .room-no-screen {
   display: flex;
   flex-direction: column;
@@ -334,19 +386,68 @@
   color: #bbb;
 }
 
+/* ─── TAB BUTTONS ────────────────────────────────────── */
+.room-panel-tab {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 22px;
+  height: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 2.5px solid transparent;
+  border-right: 2px solid #000;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #888;
+  cursor: pointer;
+  transition: color 0.14s, background 0.14s, border-color 0.14s;
+  white-space: nowrap;
+}
+
+.room-panel-tab:last-child {
+  border-right: none;
+}
+
+.room-panel-tab:hover:not(.active) {
+  color: #333;
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.room-panel-tab.active {
+  color: #000;
+  background: #fff;
+  border-bottom-color: #000;
+}
+
+.room-panel-tab-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ff6b9d;
+  border: 1.5px solid #000;
+  flex-shrink: 0;
+}
+
 /* ─── RESPONSIVE ─────────────────────────────────────── */
 @media (max-width: 900px) {
   .room-body {
     flex-direction: column;
   }
 
-  .room-whiteboard-panel {
+  .room-screen-panel {
+    flex: 0 0 auto;
+    width: 100%;
+    height: 280px;
     border-right: none;
     border-bottom: 2px solid #000;
   }
 
-  .room-screen-panel {
+  .room-right-panel {
+    flex: 1;
     width: 100%;
-    height: 280px;
+    min-height: 400px;
   }
 }

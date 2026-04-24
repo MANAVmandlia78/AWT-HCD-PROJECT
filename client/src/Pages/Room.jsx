@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSocket } from "../Providers/Socket";
 import Whiteboard from "./Whiteboard";
+import Clipboard from "./Clipboard";
 import "../Styles/room.css";
 
 const rtcConfig = {
@@ -10,6 +11,17 @@ const rtcConfig = {
     { urls: "stun:global.stun.twilio.com:3478" },
   ],
 };
+
+function getRoleFromToken() {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) return null;
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.role || null;
+  } catch {
+    return null;
+  }
+}
 
 const Room = () => {
   const socket = useSocket();
@@ -21,7 +33,9 @@ const Room = () => {
   const [remoteStream, setRemoteStream] = useState(null);
   const [isSharing, setIsSharing] = useState(false);
   const [notice, setNotice] = useState("");
+  const [rightPanel, setRightPanel] = useState("whiteboard");
 
+  const roleRef = useRef(getRoleFromToken());
   const peersRef = useRef(new Map());
   const participantsRef = useRef([]);
   const remoteStreamRef = useRef(null);
@@ -41,18 +55,14 @@ const Room = () => {
 
   const createPeerConnection = useCallback((id) => {
     if (peersRef.current.has(id)) return peersRef.current.get(id);
-
     const pc = new RTCPeerConnection(rtcConfig);
-
     pc.onicecandidate = (e) => {
       if (e.candidate) socket.emit("webrtc-ice-candidate", { to: id, candidate: e.candidate });
     };
-
     pc.ontrack = (e) => {
       const stream = e.streams[0];
       if (stream) { setRemoteStream(stream); remoteStreamRef.current = stream; }
     };
-
     peersRef.current.set(id, pc);
     return pc;
   }, [socket]);
@@ -64,10 +74,8 @@ const Room = () => {
   const createOffer = useCallback(async (id) => {
     const stream = myStreamRef.current;
     if (!stream) return;
-
     const pc = createPeerConnection(id);
     addTracks(pc, stream);
-
     const offer = await pc.createOffer();
     await pc.setLocalDescription(offer);
     socket.emit("webrtc-offer", { to: id, offer });
@@ -75,12 +83,10 @@ const Room = () => {
 
   const startScreenShare = async () => {
     if (!socket?.id) return;
-
     if (currentSharer && currentSharer.socketId !== socket.id) {
       setNotice("Another user is already sharing");
       return;
     }
-
     try {
       const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
       stream.getTracks().forEach((t) => { t.onended = stopScreenShare; });
@@ -104,7 +110,6 @@ const Room = () => {
     if (!socket || !roomId) return;
     const token = localStorage.getItem("token");
     if (!token) return;
-
     socket.emit("join-room", { roomId, token });
     socket.on("joined-room", () => socket.emit("get-room-state"));
     return () => { socket.off("joined-room"); };
@@ -117,15 +122,11 @@ const Room = () => {
       setParticipants(participants);
       setCurrentSharer(currentSharer);
     });
-
     socket.on("participants-update", ({ participants }) => setParticipants(participants));
-
     socket.on("participant-joined", async ({ socketId }) => {
       if (isSharing) await createOffer(socketId);
     });
-
     socket.on("participant-left", ({ socketId }) => closePeerConnection(socketId));
-
     socket.on("screen-share-started", ({ sharerSocketId, userId }) => {
       setCurrentSharer({ socketId: sharerSocketId, userId });
       if (socket.id === sharerSocketId) {
@@ -134,13 +135,11 @@ const Room = () => {
         });
       }
     });
-
     socket.on("screen-share-stopped", () => {
       setCurrentSharer(null);
       setRemoteStream(null);
       closeAllPeerConnections();
     });
-
     socket.on("webrtc-offer", async ({ from, offer }) => {
       const pc = createPeerConnection(from);
       await pc.setRemoteDescription(offer);
@@ -148,12 +147,10 @@ const Room = () => {
       await pc.setLocalDescription(answer);
       socket.emit("webrtc-answer", { to: from, answer });
     });
-
     socket.on("webrtc-answer", async ({ from, answer }) => {
       const pc = peersRef.current.get(from);
       if (pc) await pc.setRemoteDescription(answer);
     });
-
     socket.on("webrtc-ice-candidate", async ({ from, candidate }) => {
       const pc = createPeerConnection(from);
       if (candidate) await pc.addIceCandidate(candidate);
@@ -178,24 +175,19 @@ const Room = () => {
 
   return (
     <div className="room-root">
-
-      {/* Ambient gradient blob */}
       <div className="gradient-mid" />
 
       {/* ── TOPBAR ── */}
       <header className="room-topbar">
         <div className="room-id-tag">Room: {roomId}</div>
-
         <div className="room-participants-pill">
           {participants.length} participant{participants.length !== 1 ? "s" : ""}
         </div>
-
         {currentSharer && (
           <div className="room-sharer-notice">
             Sharing: {currentSharer.userId}
           </div>
         )}
-
         <button
           className={`room-share-btn ${isSharing ? "stop" : "start"}`}
           onClick={isSharing ? stopScreenShare : startScreenShare}
@@ -207,7 +199,7 @@ const Room = () => {
       {/* ── BODY ── */}
       <div className="room-body">
 
-        {/* LEFT — Screen share */}
+        {/* LEFT — Screen share (unchanged) */}
         <div className="room-screen-panel">
           <div className="room-panel-topbar">
             <span className="room-panel-label">Screen Share</span>
@@ -232,16 +224,49 @@ const Room = () => {
 
         <div className="room-divider" />
 
-        {/* RIGHT — Whiteboard */}
-        <div className="room-whiteboard-panel">
-          <div className="room-panel-topbar">
-            <span className="room-panel-label">Whiteboard</span>
-          </div>
-          <div className="room-whiteboard-content">
-            <Whiteboard />
-          </div>
-        </div>
+        {/* ── RIGHT PANEL — tab bar + independently scrollable content ── */}
+        <div className="room-right-panel">
 
+          {/* Tab header — always visible, never scrolls away */}
+          <div className="room-panel-topbar room-panel-topbar--tabs">
+            <button
+              className={`room-panel-tab ${rightPanel === "whiteboard" ? "active" : ""}`}
+              onClick={() => setRightPanel("whiteboard")}
+            >
+              ✏️ Whiteboard
+            </button>
+            <button
+              className={`room-panel-tab ${rightPanel === "clipboard" ? "active" : ""}`}
+              onClick={() => setRightPanel("clipboard")}
+            >
+              📋 Clipboard
+              {roleRef.current === "teacher" && (
+                <span className="room-panel-tab-dot" />
+              )}
+            </button>
+          </div>
+
+          {/* Scroll containers — both always mounted, only one visible.
+              Each is overflow: auto in both axes so content is fully reachable. */}
+          <div
+            className="room-panel-scroll"
+            style={{ display: rightPanel === "whiteboard" ? "flex" : "none" }}
+          >
+            {/* Whiteboard needs a minimum size to be usable; it draws on canvas
+                so we give it a fixed inner size that the scroll container reveals */}
+            <div className="room-whiteboard-inner">
+              <Whiteboard />
+            </div>
+          </div>
+
+          <div
+            className="room-panel-scroll room-panel-scroll--clipboard"
+            style={{ display: rightPanel === "clipboard" ? "flex" : "none" }}
+          >
+            <Clipboard socket={socket} role={roleRef.current} roomId={roomId} />
+          </div>
+
+        </div>
       </div>
     </div>
   );
