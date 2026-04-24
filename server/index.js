@@ -33,31 +33,24 @@ app.use(cors({
 app.use(express.json());
 app.use(bodyParser.json());
 app.use("/api/auth", authRoutes);
-app.get("/api/assignments/:courseId", (req, res) => {
-  try {
-    const token = req.headers.authorization?.split(" ")[1];
-    if (!token) return res.status(401).json({ message: "No token" });
+app.get("/api/assignments/:courseId", verifyToken, (req, res) => {
+  const user = req.user; // ✅ from middleware
+  const courseId = req.params.courseId;
 
-    const user = jwt.verify(token, process.env.JWT_SECRET);
-    const courseId = req.params.courseId;
+  const query = `
+    SELECT assignments.*, users.name AS teacher_name
+    FROM assignments
+    JOIN users ON assignments.teacher_id = users.id
+    WHERE assignments.course_id = ?
+    ORDER BY assignments.created_at DESC
+  `;
 
-    const query = `
-      SELECT assignments.*, users.name AS teacher_name
-      FROM assignments
-      JOIN users ON assignments.teacher_id = users.id
-      WHERE assignments.course_id = ?
-      ORDER BY assignments.created_at DESC
-    `;
+  db.query(query, [courseId], (err, result) => {
+    if (err) return res.status(500).json(err);
 
-    db.query(query, [courseId], (err, result) => {
-      if (err) return res.status(500).json(err);
-
-      res.json(result);
-    });
-
-  } catch (err) {
-    res.status(401).json({ message: "Invalid token" });
-  }
+    console.log("Assignments fetched:", result); // 🔥 debug
+    res.json(result);
+  });
 });
 app.post("/api/submissions", async (req, res) => {
   try {

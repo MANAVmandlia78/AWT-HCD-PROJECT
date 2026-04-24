@@ -11,29 +11,51 @@ const Assignments = () => {
   const [assignments, setAssignments] = useState([]);
   const token = localStorage.getItem("token");
 
-  useEffect(() => { fetchAssignments(); }, [id]);
+  useEffect(() => {
+    fetchAssignments();
+  }, [id]);
 
+  // ✅ Fetch assignments
   const fetchAssignments = async () => {
     try {
       const res = await axios.get(
         `http://localhost:8000/api/assignments/${id}`,
-        { headers: { Authorization: `Bearer ${token}` } }
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
       );
+
+      console.log("Assignments:", res.data);
       setAssignments(res.data);
-    } catch (err) { console.log(err); }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
+  // ✅ Submit assignment
   const handleSubmit = async (assignmentId, file) => {
     try {
       if (!file) return;
-      const storageRef = ref(storage, `submissions/${Date.now()}_${file.name}`);
+
+      const storageRef = ref(
+        storage,
+        `submissions/${Date.now()}_${file.name}`
+      );
+
       await uploadBytes(storageRef, file);
       const fileUrl = await getDownloadURL(storageRef);
+
       await axios.post(
         "http://localhost:8000/api/submissions",
-        { assignment_id: assignmentId, file_url: fileUrl },
-        { headers: { Authorization: `Bearer ${token}` } }
+        {
+          assignment_id: assignmentId,
+          file_url: fileUrl,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
       );
+
       alert("Submitted successfully ✅");
     } catch (err) {
       console.log(err);
@@ -41,57 +63,60 @@ const Assignments = () => {
     }
   };
 
-  const today = new Date();
-
-  const getCategory = (dueDate) => {
-    const d = new Date(dueDate);
-    if (d < today) return "past";
-    if (d.toDateString() === today.toDateString()) return "today";
-    return "upcoming";
-  };
-
-  const grouped = { overdue: [], upcoming: [], past: [] };
-
-  assignments.forEach((a) => {
-    const category = getCategory(a.due_date);
-    if (category === "past") grouped.overdue.push(a);
-    else if (category === "today" || category === "upcoming") grouped.upcoming.push(a);
-    else grouped.past.push(a);
-  });
-
-  const renderSection = (title, data) => (
-    <div className="assignment-section">
-      <h3>{title}</h3>
-      {data.length === 0 ? (
-        <p style={{ padding: "16px 24px", color: "#aaa", fontSize: "12px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>
-          No assignments here
-        </p>
-      ) : data.map((a) => (
-        <div key={a.id} className="assignment-row">
-          <div className="assignment-info">
-            <h4>{a.title}</h4>
-            <p>{a.description}</p>
-            <span>Due: {a.due_date}</span>
-          </div>
-          <div className="assignment-actions">
-            <a href={a.file_url} target="_blank" rel="noreferrer">View</a>
-            <input
-              type="file"
-              onChange={(e) => handleSubmit(a.id, e.target.files[0])}
-            />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-
   return (
     <div className="assignments-container">
       <div className="gradient-mid" />
+
       <h2 className="title">Assignments</h2>
-      {renderSection("Assignments", grouped.overdue)}
-      {/* {renderSection("Upcoming Assignments", grouped.upcoming)}
-      {renderSection("Past Assignments", grouped.past)} */}
+
+      {/* 🔥 Keep section styling */}
+      <div className="assignment-section">
+        <h3>All Assignments</h3>
+
+        {assignments.length === 0 ? (
+          <p
+            style={{
+              padding: "16px 24px",
+              color: "#aaa",
+              fontSize: "12px",
+              fontWeight: 700,
+              textTransform: "uppercase",
+              letterSpacing: "0.08em",
+            }}
+          >
+            No assignments here
+          </p>
+        ) : (
+          assignments.map((a) => (
+            <div key={a.id} className="assignment-row">
+              <div className="assignment-info">
+                <h4>{a.title}</h4>
+                <p>{a.description}</p>
+
+                <span>
+                  📅 Due:{" "}
+                  {a.due_date
+                    ? new Date(a.due_date).toLocaleDateString()
+                    : "No deadline"}
+                </span>
+              </div>
+
+              <div className="assignment-actions">
+                <a href={a.file_url} target="_blank" rel="noreferrer">
+                  View
+                </a>
+
+                <input
+                  type="file"
+                  onChange={(e) =>
+                    handleSubmit(a.id, e.target.files[0])
+                  }
+                />
+              </div>
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 };

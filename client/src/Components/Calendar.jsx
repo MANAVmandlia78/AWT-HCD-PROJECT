@@ -17,46 +17,38 @@ const Calendar = () => {
     try {
       const res = await axios.get(
         "http://localhost:8000/api/student/assignments",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-
       setAssignments(res.data);
     } catch (err) {
       console.log(err);
     }
   };
 
-  // ✅ STATUS LOGIC
   const getStatus = (date) => {
     const d = new Date(date);
     const t = new Date();
-
     d.setHours(0, 0, 0, 0);
     t.setHours(0, 0, 0, 0);
-
     if (d.getTime() === t.getTime()) return "today";
     if (d < t) return "past";
     return "future";
   };
 
-  // ✅ CURRENT MONTH
   const currentMonth = today.getMonth();
   const currentYear = today.getFullYear();
-
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
   const startDay = new Date(currentYear, currentMonth, 1).getDay();
 
   const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
   const blanks = Array.from({ length: startDay }, (_, i) => i);
   const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
   return (
     <div className="calendar-container">
+
+      {/* Ambient gradient blob */}
+      <div className="gradient-mid" />
 
       {/* HEADER */}
       <div className="calendar-header">
@@ -82,24 +74,19 @@ const Calendar = () => {
       {/* GRID */}
       <div className="calendar-grid">
 
-        {/* BLANK DAYS */}
         {blanks.map((b) => (
           <div key={`blank-${b}`} className="day-box blank" />
         ))}
 
-        {/* ACTUAL DAYS */}
         {days.map((day) => {
           const fullDate = new Date(currentYear, currentMonth, day)
             .toISOString()
             .split("T")[0];
 
-          // ✅ FILTER ASSIGNMENTS FOR THAT DAY
           const dayAssignments = assignments.filter(
-            (a) =>
-              new Date(a.due_date).toISOString().split("T")[0] === fullDate
+            (a) => new Date(a.due_date).toISOString().split("T")[0] === fullDate
           );
 
-          // ✅ REMOVE DUPLICATE SUBJECTS
           const uniqueSubjects = [
             ...new Set(dayAssignments.map((a) => a.course_name)),
           ];
@@ -117,12 +104,9 @@ const Calendar = () => {
                 <span className="today-badge">TODAY</span>
               )}
 
-              {/* ✅ SHOW ONLY SUBJECT NAMES */}
               {uniqueSubjects.map((subject, index) => (
                 <div key={index} className="assignment">
-                  <div className="subject">
-                    {subject || "Unknown"}
-                  </div>
+                  <div className="subject">{subject || "Unknown"}</div>
                 </div>
               ))}
             </div>
