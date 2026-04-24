@@ -295,34 +295,45 @@
 .studentquiz-option:nth-child(4):not(.selected):hover { background: #f0fdf8; transform: translateX(4px); }
 
 /* ─── SELECTED STATE ─────────────────────────────────── */
+/* ─── SELECTED STATE ─────────────────────────────────── */
 .studentquiz-option.selected {
-  border-color: #b06bff;
-  box-shadow: 3px 3px 0 #b06bff;
-  background: #faf5ff;
+  border-color: #000;
+  box-shadow: none;
+  background: transparent;
   transform: translateX(4px);
 }
 
 .studentquiz-option.selected::before {
-  background: #b06bff !important;
+  width: 6px;
 }
 
+.studentquiz-option:nth-child(1).selected { background: #fff5f9; border-color: #ff6b9d; }
+.studentquiz-option:nth-child(2).selected { background: #f5f7ff; border-color: #6b8eff; }
+.studentquiz-option:nth-child(3).selected { background: #fffbf0; border-color: #ffc96b; }
+.studentquiz-option:nth-child(4).selected { background: #f0fdf8; border-color: #6bddaa; }
+
+.studentquiz-option:nth-child(1).selected::before { background: #ff6b9d; }
+.studentquiz-option:nth-child(2).selected::before { background: #6b8eff; }
+.studentquiz-option:nth-child(3).selected::before { background: #ffc96b; }
+.studentquiz-option:nth-child(4).selected::before { background: #6bddaa; }
+
 .studentquiz-option.selected .option-letter {
-  background: linear-gradient(135deg, #b06bff, #6b8eff);
-  color: #fff;
-  border-color: transparent;
+  background: #fff;
+  color: #000;
+  border: 3px solid black;
 }
 
 .studentquiz-option.selected .option-text {
-  color: #6a00cc;
+  color: #000;
   font-weight: 700;
 }
-
 /* ─── OPTION LETTER BADGE ────────────────────────────── */
 .option-letter {
   width: 28px;
   height: 28px;
-  background: #000;
-  color: #fff;
+  background: #fff;
+  color: #000;
+  border: 3px solid black;
   font-size: 11px;
   font-weight: 900;
   letter-spacing: 0.05em;
@@ -349,35 +360,127 @@
 
 /* ─── SUBMIT BUTTON ──────────────────────────────────── */
 .studentquiz-submit {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  margin: 28px auto 0 auto;
-  padding: 14px 40px;
-  background: linear-gradient(135deg, #ff6b9d, #b06bff);
-  color: #fff;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  border: 2px solid #000;
-  border-radius: 8px;
-  cursor: pointer;
-  box-shadow: 4px 4px 0 #000;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-  max-width: 960px;
-  width: 100%;
-  box-sizing: border-box;
-  position: relative;
-  z-index: 1;
-  font-family: 'Comic Neue', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    margin: 28px auto 0 auto;
+    padding: 14px 40px;
+    background: linear-gradient(135deg, #fffbf0, #fffbf0);
+    color: #212529;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border: 2px solid #000;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 #000;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    max-width: 960px;
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 1;
+    font-family: 'Comic Neue', sans-serif;
 }
-
 .studentquiz-submit:hover {
   transform: translate(-3px, -3px);
   box-shadow: 7px 7px 0 #000;
-  background: linear-gradient(135deg, #ff4d7e, #9b4dff);
+   background: linear-gradient(135deg, #fffbf0, #fffbf0);
+}
+
+/* ─── ADD THESE TO THE BOTTOM OF studentquiz.css ─── */
+
+/* ── Reference image block per question ── */
+.question-ref-image-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.question-ref-label {
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #888;
+  margin: 0;
+}
+
+.question-ref-image {
+  max-width: 100%;
+  max-height: 240px;
+  object-fit: contain;
+  border: 2px solid #000;
+  border-radius: 10px;
+  box-shadow: 4px 4px 0 #000;
+  cursor: zoom-in;
+  display: block;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.question-ref-image:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 #000;
+}
+
+.question-ref-hint {
+  font-size: 10px;
+  font-weight: 700;
+  color: #aaa;
+  letter-spacing: 0.04em;
+}
+
+/* ── Lightbox overlay ── */
+.image-lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.82);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+  cursor: zoom-out;
+}
+
+.lightbox-img {
+  max-width: 90vw;
+  max-height: 85vh;
+  object-fit: contain;
+  border: 3px solid #fff;
+  border-radius: 12px;
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.8);
+}
+
+.lightbox-close {
+  position: fixed;
+  top: 20px;
+  right: 24px;
+  width: 40px;
+  height: 40px;
+  background: #fff;
+  border: 2px solid #000;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 900;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 3px 3px 0 #000;
+  z-index: 1001;
+}
+
+/* ── KaTeX inside option text ── */
+.option-text .katex {
+  font-size: 0.95em;
+}
+
+.studentquiz-question-text .katex-display {
+  margin: 8px 0;
 }
 
 /* ─── RESPONSIVE ─────────────────────────────────────── */

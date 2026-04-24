@@ -408,13 +408,14 @@ app.post("/api/quizzes", async (req, res) => {
             q.optionC,
             q.optionD,
             q.correct,
+            q.image_url || null, 
           ]);
 
           const questionQuery = `
-            INSERT INTO questions
-            (quiz_id, question_text, option_a, option_b, option_c, option_d, correct_option)
-            VALUES ?
-          `;
+  INSERT INTO questions
+  (quiz_id, question_text, option_a, option_b, option_c, option_d, correct_option, image_url)
+  VALUES ?
+`; 
 
           db.query(questionQuery, [questionValues], (err2) => {
             if (err2) return res.status(500).json(err2);
@@ -527,16 +528,9 @@ app.get("/api/quizzes/:quizId", (req, res) => {
   const quizId = req.params.quizId;
 
   const query = `
-    SELECT 
-      id,
-      question_text,
-      option_a,
-      option_b,
-      option_c,
-      option_d
-    FROM questions
-    WHERE quiz_id = ?
-  `;
+  SELECT id, question_text, option_a, option_b, option_c, option_d, image_url
+  FROM questions WHERE quiz_id = ?
+`;
 
   db.query(query, [quizId], (err, result) => {
     if (err) return res.status(500).json(err);
@@ -573,77 +567,234 @@ app.get("/api/quizzes/:quizId/result", (req, res) => {
     res.status(401).json({ message: "Invalid token" });
   }
 });
+const nodemailer = require("nodemailer");
+
+// Create transporter (configure with your email provider)
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,       // your Gmail address
+    pass: process.env.EMAIL_PASS,       // Gmail App Password (not regular password)
+  },
+});
+
 app.post("/api/quizzes/submit", (req, res) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(401).json({ message: "No token" });
-
     const user = jwt.verify(token, process.env.JWT_SECRET);
-
     if (user.role?.toLowerCase().trim() !== "student") {
       return res.status(403).json({ message: "Only students can submit" });
     }
 
     const { quiz_id, answers } = req.body;
 
-    // 🔥 Get course_id of quiz
-    const getCourseQuery = `
-      SELECT course_id FROM quizzes WHERE id = ?
-    `;
-
+    const getCourseQuery = `SELECT course_id FROM quizzes WHERE id = ?`;
     db.query(getCourseQuery, [quiz_id], (err, quizResult) => {
       if (err) return res.status(500).json(err);
-
       const courseId = quizResult[0].course_id;
 
-      // 🔥 Check enrollment
       const checkEnrollQuery = `
         SELECT * FROM course_enrollments 
         WHERE student_id = ? AND course_id = ?
       `;
-
       db.query(checkEnrollQuery, [user.id, courseId], (err2, enrollResult) => {
         if (err2) return res.status(500).json(err2);
-
         if (enrollResult.length === 0) {
           return res.status(403).json({ message: "Not enrolled in this course" });
         }
 
-        // 🔥 Continue original logic
-        const query = `
-          SELECT id, correct_option 
-          FROM questions 
-          WHERE quiz_id = ?
-        `;
-
+        const query = `SELECT id, correct_option FROM questions WHERE quiz_id = ?`;
         db.query(query, [quiz_id], (err3, questions) => {
           if (err3) return res.status(500).json(err3);
 
           let score = 0;
-
           questions.forEach((q) => {
-            if (answers[q.id] === q.correct_option) {
-              score++;
-            }
+            if (answers[q.id] === q.correct_option) score++;
           });
+
+          const total = questions.length;
 
           const insertQuery = `
             INSERT INTO quiz_submissions (quiz_id, student_id, score)
             VALUES (?, ?, ?)
           `;
-
           db.query(insertQuery, [quiz_id, user.id, score], (err4) => {
             if (err4) return res.status(500).json(err4);
 
-            res.json({
-              message: "Quiz submitted successfully",
-              score,
+            // ✅ Respond immediately — don't wait for email
+            res.json({ message: "Quiz submitted successfully", score });
+
+            // 📧 Fetch student info to send email
+            const getUserQuery = `
+              SELECT u.name, u.email, q.title 
+              FROM users u, quizzes q 
+              WHERE u.id = ? AND q.id = ?
+            `;
+            db.query(getUserQuery, [user.id, quiz_id], (err5, userResult) => {
+              if (err5 || userResult.length === 0) return;
+
+              const { name, email, title } = userResult[0];
+              const percentage = Math.round((score / total) * 100);
+
+              let grade = "F";
+              let gradeColor = "#e74c3c";
+              if (percentage >= 90) { grade = "A+"; gradeColor = "#27ae60"; }
+              else if (percentage >= 80) { grade = "A";  gradeColor = "#2ecc71"; }
+              else if (percentage >= 70) { grade = "B";  gradeColor = "#3498db"; }
+              else if (percentage >= 60) { grade = "C";  gradeColor = "#f39c12"; }
+              else if (percentage >= 50) { grade = "D";  gradeColor = "#e67e22"; }
+
+              const emoji = percentage >= 70 ? "🎉" : percentage >= 50 ? "📚" : "💪";
+              const message =
+                percentage >= 70
+                  ? "Excellent work! You've demonstrated strong understanding."
+                  : percentage >= 50
+                  ? "Good effort! Keep practicing to improve further."
+                  : "Don't give up! Review the material and try again.";
+
+              const htmlEmail = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quiz Result</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f0f4f8;font-family:'Segoe UI',Arial,sans-serif;">
+
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f0f4f8;padding:40px 0;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.10);">
+
+          <!-- Header -->
+          <tr>
+            <td style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);padding:40px 40px 30px;text-align:center;">
+              <div style="font-size:48px;margin-bottom:8px;">🎓</div>
+              <h1 style="color:#ffffff;margin:0;font-size:28px;font-weight:700;letter-spacing:-0.5px;">Quiz Result</h1>
+              <p style="color:rgba(255,255,255,0.85);margin:8px 0 0;font-size:15px;">${title}</p>
+            </td>
+          </tr>
+
+          <!-- Greeting -->
+          <tr>
+            <td style="padding:32px 40px 0;">
+              <p style="margin:0;font-size:17px;color:#2d3748;">
+                Hi <strong>${name}</strong>, ${emoji}
+              </p>
+              <p style="margin:10px 0 0;font-size:15px;color:#718096;line-height:1.6;">
+                Your quiz has been submitted successfully. Here's your performance summary:
+              </p>
+            </td>
+          </tr>
+
+          <!-- Score Card -->
+          <tr>
+            <td style="padding:28px 40px;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="background:#f7fafc;border-radius:12px;overflow:hidden;border:1px solid #e2e8f0;">
+                
+                <!-- Score Circle Row -->
+                <tr>
+                  <td style="padding:32px;text-align:center;">
+                    <div style="display:inline-block;width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,${gradeColor},${gradeColor}cc);display:inline-flex;align-items:center;justify-content:center;">
+                      <table cellpadding="0" cellspacing="0" style="margin:0 auto;">
+                        <tr><td style="text-align:center;">
+                          <div style="font-size:36px;font-weight:800;color:#fff;line-height:1;">${score}</div>
+                          <div style="font-size:13px;color:rgba(255,255,255,0.85);margin-top:2px;">out of ${total}</div>
+                        </td></tr>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Stats Row -->
+                <tr>
+                  <td style="padding:0 24px 24px;">
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <!-- Score -->
+                        <td width="33%" style="text-align:center;padding:16px 8px;background:#fff;border-radius:10px;margin:4px;">
+                          <div style="font-size:22px;font-weight:700;color:#2d3748;">${score}/${total}</div>
+                          <div style="font-size:12px;color:#a0aec0;margin-top:4px;text-transform:uppercase;letter-spacing:0.5px;">Score</div>
+                        </td>
+                        <!-- Spacer -->
+                        <td width="4%"></td>
+                        <!-- Percentage -->
+                        <td width="30%" style="text-align:center;padding:16px 8px;background:#fff;border-radius:10px;">
+                          <div style="font-size:22px;font-weight:700;color:#2d3748;">${percentage}%</div>
+                          <div style="font-size:12px;color:#a0aec0;margin-top:4px;text-transform:uppercase;letter-spacing:0.5px;">Percentage</div>
+                        </td>
+                        <!-- Spacer -->
+                        <td width="4%"></td>
+                        <!-- Grade -->
+                        <td width="29%" style="text-align:center;padding:16px 8px;background:#fff;border-radius:10px;">
+                          <div style="font-size:22px;font-weight:700;color:${gradeColor};">${grade}</div>
+                          <div style="font-size:12px;color:#a0aec0;margin-top:4px;text-transform:uppercase;letter-spacing:0.5px;">Grade</div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- Progress Bar -->
+                <tr>
+                  <td style="padding:0 24px 24px;">
+                    <div style="background:#e2e8f0;border-radius:99px;height:10px;overflow:hidden;">
+                      <div style="width:${percentage}%;height:100%;background:linear-gradient(90deg,${gradeColor},${gradeColor}99);border-radius:99px;"></div>
+                    </div>
+                    <p style="margin:8px 0 0;font-size:12px;color:#a0aec0;text-align:right;">${percentage}% completed correctly</p>
+                  </td>
+                </tr>
+
+              </table>
+            </td>
+          </tr>
+
+          <!-- Message -->
+          <tr>
+            <td style="padding:0 40px 32px;">
+              <div style="background:linear-gradient(135deg,${gradeColor}15,${gradeColor}08);border-left:4px solid ${gradeColor};border-radius:0 8px 8px 0;padding:16px 20px;">
+                <p style="margin:0;font-size:15px;color:#2d3748;line-height:1.6;">${message}</p>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background:#f7fafc;border-top:1px solid #e2e8f0;padding:24px 40px;text-align:center;">
+              <p style="margin:0;font-size:13px;color:#a0aec0;">
+                This is an automated message from <strong style="color:#667eea;">ClassConnect</strong>
+              </p>
+              <p style="margin:6px 0 0;font-size:12px;color:#cbd5e0;">
+                Please do not reply to this email.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>
+              `;
+
+              transporter.sendMail({
+                from: `"ClassConnect" <${process.env.EMAIL_USER}>`,
+                to: email,
+                subject: `📊 Your Quiz Result — ${title}`,
+                html: htmlEmail,
+              }, (mailErr) => {
+                if (mailErr) console.error("Email send failed:", mailErr.message);
+                else console.log(`✅ Result email sent to ${email}`);
+              });
             });
           });
         });
       });
     });
-
   } catch (err) {
     res.status(401).json({ message: "Invalid token" });
   }

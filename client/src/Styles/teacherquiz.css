@@ -360,35 +360,309 @@
 
 /* ─── SUBMIT BUTTON ──────────────────────────────────── */
 .teacherquiz-submit {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  margin: 28px auto 0 auto;
-  padding: 14px 40px;
-  background: linear-gradient(135deg, #ff6b9d, #b06bff);
-  color: #fff;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  border: 2px solid #000;
-  border-radius: 8px;
-  cursor: pointer;
-  box-shadow: 4px 4px 0 #000;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-  max-width: 960px;
-  width: 100%;
-  box-sizing: border-box;
-  font-family: 'Comic Neue', sans-serif;
-  position: relative;
-  z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    margin: 28px auto 0 auto;
+    padding: 14px 40px;
+    background: linear-gradient(135deg, #fffbf0, #fffbf0);
+    color: #212529;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border: 2px solid #000;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 #000;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    max-width: 960px;
+    width: 100%;
+    box-sizing: border-box;
+    font-family: 'Comic Neue', sans-serif;
+    position: relative;
+    z-index: 1;
 }
-
 .teacherquiz-submit:hover {
   transform: translate(-3px, -3px);
   box-shadow: 7px 7px 0 #000;
-  background: linear-gradient(135deg, #ff4d7e, #9b4dff);
+  background: linear-gradient(135deg, #fffbf0, #fffbf0);
+}
+
+/* ─── ADD THESE TO THE BOTTOM OF teacherquiz.css ─── */
+
+/* ── Preview toggle button in card topbar ── */
+.question-card-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.preview-toggle-btn {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: #fff;
+  border: 2px solid #000;
+  border-radius: 6px;
+  padding: 5px 12px;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 #000;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  font-family: 'Comic Neue', sans-serif;
+}
+
+.preview-toggle-btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 #000;
+}
+
+/* ── LaTeX badge next to field label ── */
+.latex-badge {
+  display: inline-block;
+  margin-left: 8px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #f5f7ff, #eaedff);
+  border: 1.5px solid #6b8eff;
+  color: #6b8eff;
+  border-radius: 4px;
+  padding: 2px 7px;
+}
+
+/* ── Optional badge ── */
+.optional-badge {
+  display: inline-block;
+  margin-left: 8px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: #f5f5f5;
+  border: 1.5px solid #ccc;
+  color: #999;
+  border-radius: 4px;
+  padding: 2px 7px;
+}
+
+/* ── LaTeX hint box inside quiz settings ── */
+.latex-hint-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: linear-gradient(135deg, #f5f7ff, #eaedff);
+  border: 2px solid #000;
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-top: 4px;
+  box-shadow: 3px 3px 0 #000;
+}
+
+.latex-hint-icon {
+  font-size: 22px;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.latex-hint-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+  line-height: 1.6;
+}
+
+.latex-hint-text strong {
+  font-weight: 900;
+  color: #000;
+}
+
+.latex-hint-text code {
+  background: #fff;
+  border: 1.5px solid #6b8eff;
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 11px;
+  color: #4a00cc;
+  font-family: monospace;
+}
+
+.latex-hint-text em {
+  font-style: normal;
+  font-weight: 800;
+  color: #000;
+}
+
+/* ── LaTeX preview panel ── */
+.latex-preview-panel {
+  background: linear-gradient(135deg, #fffbf0, #fff8f5);
+  border: 2px solid #000;
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  box-shadow: 3px 3px 0 #ffc96b;
+}
+
+.latex-preview-label {
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #888;
+  margin: 0 0 10px 0;
+}
+
+.latex-preview-question {
+  font-size: 15px;
+  font-weight: 700;
+  color: #000;
+  margin-bottom: 14px;
+  line-height: 1.6;
+}
+
+.latex-preview-image {
+  max-width: 100%;
+  max-height: 200px;
+  border: 2px solid #000;
+  border-radius: 8px;
+  margin-bottom: 14px;
+  display: block;
+  object-fit: contain;
+}
+
+.latex-preview-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.latex-preview-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #333;
+}
+
+.latex-preview-option-letter {
+  width: 24px;
+  height: 24px;
+  background: #000;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 900;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ── Question textarea (for multi-line equation input) ── */
+.question-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 2px solid #000;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Comic Neue', monospace;
+  background: #fff;
+  resize: vertical;
+  transition: box-shadow 0.15s ease;
+}
+
+.question-field textarea:focus {
+  outline: none;
+  box-shadow: 3px 3px 0 #000;
+}
+
+/* ── Image upload label button ── */
+.image-upload-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: #fff;
+  border: 2px solid #000;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: 3px 3px 0 #000;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  font-family: 'Comic Neue', sans-serif;
+}
+
+.image-upload-label:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 #000;
+}
+
+/* ── Image preview wrapper ── */
+.image-preview-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.question-image-preview {
+  max-width: 100%;
+  max-height: 220px;
+  object-fit: contain;
+  border: 2px solid #000;
+  border-radius: 10px;
+  box-shadow: 4px 4px 0 #000;
+  display: block;
+}
+
+.image-preview-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.upload-status {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.upload-status.uploading { color: #f59e0b; }
+.upload-status.done { color: #10b981; }
+
+.remove-image-btn {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: #fff;
+  border: 2px solid #000;
+  border-radius: 6px;
+  padding: 4px 12px;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 #000;
+  color: #e53e3e;
+  transition: transform 0.15s ease;
+  font-family: 'Comic Neue', sans-serif;
+}
+
+.remove-image-btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 #000;
+}
+
+/* ── KaTeX overrides to match font weight ── */
+.latex-preview-span .katex {
+  font-size: 1em;
 }
 
 /* ─── RESPONSIVE ─────────────────────────────────────── */

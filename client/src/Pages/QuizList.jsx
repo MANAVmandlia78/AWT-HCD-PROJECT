@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import "../Styles/quizlist.css";
 
 const QuizList = () => {
-  const { id } = useParams(); // 🔥 courseId
+  const { id } = useParams();
   const [quizzes, setQuizzes] = useState([]);
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
@@ -16,14 +16,9 @@ const QuizList = () => {
   const fetchQuizzes = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:8000/api/quizzes/course/${id}`, // 🔥 FIXED
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        `http://localhost:8000/api/quizzes/course/${id}`,
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-
       setQuizzes(res.data);
     } catch (err) {
       console.log(err);
@@ -32,6 +27,10 @@ const QuizList = () => {
 
   return (
     <div className="quizlist-container">
+
+      {/* Ambient gradient blob */}
+      <div className="gradient-mid" />
+
       <span className="quizlist-title">Available Quizzes</span>
 
       {quizzes.length === 0 ? (

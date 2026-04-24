@@ -1,9 +1,50 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import katex from "katex";
+import "katex/dist/katex.min.css";
 import "../Styles/studentquiz.css";
 
+/* ─────────────────────────────────────────
+   Inline LaTeX renderer — same as teacher side
+───────────────────────────────────────── */
+const LatexPreview = ({ text }) => {
+  const spanRef = useRef(null);
 
+  useEffect(() => {
+    if (!spanRef.current) return;
+    if (!text) { spanRef.current.innerHTML = ""; return; }
+
+    const parts = text.split(/(\$\$[\s\S]+?\$\$|\$[^$\n]+?\$)/g);
+    const html = parts
+      .map((part) => {
+        if (part.startsWith("$$") && part.endsWith("$$")) {
+          try {
+            return katex.renderToString(part.slice(2, -2), {
+              displayMode: true,
+              throwOnError: false,
+            });
+          } catch { return `<span style="color:red">${part}</span>`; }
+        }
+        if (part.startsWith("$") && part.endsWith("$") && part.length > 2) {
+          try {
+            return katex.renderToString(part.slice(1, -1), { throwOnError: false });
+          } catch { return `<span style="color:red">${part}</span>`; }
+        }
+        return part.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      })
+      .join("");
+
+    spanRef.current.innerHTML = html;
+  }, [text]);
+
+  if (!text) return null;
+  return <span ref={spanRef} />;
+};
+
+/* ─────────────────────────────────────────
+   Main Component
+───────────────────────────────────────── */
 const StudentQuiz = () => {
   const { id } = useParams();
   const [questions, setQuestions] = useState([]);
@@ -11,12 +52,11 @@ const StudentQuiz = () => {
   const [loading, setLoading] = useState(true);
   const [attempted, setAttempted] = useState(false);
   const [score, setScore] = useState(null);
+  const [expandedImage, setExpandedImage] = useState(null); // lightbox
 
   const token = localStorage.getItem("token");
 
-  useEffect(() => {
-    if (id) checkSubmission();
-  }, [id]);
+  useEffect(() => { if (id) checkSubmission(); }, [id]);
 
   const checkSubmission = async () => {
     try {
@@ -68,78 +108,103 @@ const StudentQuiz = () => {
   };
 
   return (
-      <div className="studentquiz-container">
-        {/* Ambient gradient blob */}
-        <div className="gradient-mid" />
+    <div className="studentquiz-container">
+      <div className="gradient-mid" />
+      <span className="studentquiz-title">Quiz</span>
 
-        <span className="studentquiz-title">Quiz</span>
+      {/* ── Lightbox ── */}
+      {expandedImage && (
+        <div className="image-lightbox" onClick={() => setExpandedImage(null)}>
+          <img src={expandedImage} alt="Reference" className="lightbox-img" />
+          <button className="lightbox-close" onClick={() => setExpandedImage(null)}>✕</button>
+        </div>
+      )}
 
-        {/* ── Already attempted ── */}
-        {attempted ? (
-          <div className="studentquiz-result">
-            <div className="studentquiz-result-topbar">
-              <span className="studentquiz-result-topbar-label">Quiz Completed</span>
-            </div>
-            <div className="studentquiz-result-body">
-              <p className="studentquiz-score-label">Your Score</p>
-              <div className="studentquiz-score-tag">{score}</div>
-              <p className="studentquiz-result-heading">Well done! Quiz has been submitted.</p>
-            </div>
+      {/* ── Already attempted ── */}
+      {attempted ? (
+        <div className="studentquiz-result">
+          <div className="studentquiz-result-topbar">
+            <span className="studentquiz-result-topbar-label">Quiz Completed</span>
           </div>
+          <div className="studentquiz-result-body">
+            <p className="studentquiz-score-label">Your Score</p>
+            <div className="studentquiz-score-tag">{score}</div>
+            <p className="studentquiz-result-heading">Well done! Quiz has been submitted.</p>
+          </div>
+        </div>
 
-        ) : loading ? (
-          <div className="studentquiz-state">Loading quiz...</div>
+      ) : loading ? (
+        <div className="studentquiz-state">Loading quiz...</div>
 
-        ) : questions.length === 0 ? (
-          <div className="studentquiz-state">No questions found</div>
+      ) : questions.length === 0 ? (
+        <div className="studentquiz-state">No questions found</div>
 
-        ) : (
-          <>
-            <div className="studentquiz-questions">
-              {questions.map((q, index) => (
-                <div key={q.id} className="studentquiz-card">
+      ) : (
+        <>
+          <div className="studentquiz-questions">
+            {questions.map((q, index) => (
+              <div key={q.id} className="studentquiz-card">
 
-                  <div className="studentquiz-card-topbar">
-                    <span className="studentquiz-card-label">Question {index + 1}</span>
-                  </div>
+                <div className="studentquiz-card-topbar">
+                  <span className="studentquiz-card-label">Question {index + 1}</span>
+                </div>
 
-                  <div className="studentquiz-card-body">
-                    <p className="studentquiz-question-text">{q.question_text}</p>
+                <div className="studentquiz-card-body">
 
-                    <div className="studentquiz-options">
-                      {["A", "B", "C", "D"].map((opt) => (
-                        <label
-                          key={opt}
-                          className={`studentquiz-option ${answers[q.id] === opt ? "selected" : ""}`}
-                          onClick={() => handleSelect(q.id, opt)}
-                        >
-                          <input
-                            type="radio"
-                            name={`q-${q.id}`}
-                            value={opt}
-                            checked={answers[q.id] === opt}
-                            onChange={() => handleSelect(q.id, opt)}
-                          />
-                          <span className="option-letter">{opt}</span>
-                          <span className="option-text">
-                            {q[`option_${opt.toLowerCase()}`]}
-                          </span>
-                        </label>
-                      ))}
+                  {/* ── Question text with LaTeX ── */}
+                  <p className="studentquiz-question-text">
+                    <LatexPreview text={q.question_text} />
+                  </p>
+
+                  {/* ── Reference Image (if any) ── */}
+                  {q.image_url && (
+                    <div className="question-ref-image-wrapper">
+                      <p className="question-ref-label">Reference Image</p>
+                      <img
+                        src={q.image_url}
+                        alt="Question reference"
+                        className="question-ref-image"
+                        onClick={() => setExpandedImage(q.image_url)}
+                        title="Click to enlarge"
+                      />
+                      <span className="question-ref-hint">Click image to enlarge</span>
                     </div>
+                  )}
+
+                  {/* ── Options ── */}
+                  <div className="studentquiz-options">
+                    {["A", "B", "C", "D"].map((opt) => (
+                      <label
+                        key={opt}
+                        className={`studentquiz-option ${answers[q.id] === opt ? "selected" : ""}`}
+                        onClick={() => handleSelect(q.id, opt)}
+                      >
+                        <input
+                          type="radio"
+                          name={`q-${q.id}`}
+                          value={opt}
+                          checked={answers[q.id] === opt}
+                          onChange={() => handleSelect(q.id, opt)}
+                        />
+                        <span className="option-letter">{opt}</span>
+                        <span className="option-text">
+                          <LatexPreview text={q[`option_${opt.toLowerCase()}`]} />
+                        </span>
+                      </label>
+                    ))}
                   </div>
 
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
+          </div>
 
-            <button className="studentquiz-submit" onClick={handleSubmit}>
-              Submit Quiz
-            </button>
-          </>
-        )}
-
-      </div>
+          <button className="studentquiz-submit" onClick={handleSubmit}>
+            Submit Quiz
+          </button>
+        </>
+      )}
+    </div>
   );
 };
 

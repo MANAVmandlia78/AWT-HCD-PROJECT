@@ -24,8 +24,8 @@ const LMSmain = () => {
         <Outlet />
         {/* <TeacherAnnouncements></TeacherAnnouncements> */}
         {/* <StudentAnnouncements></StudentAnnouncements> */}
-        {/* <TeacherCourses/> */}
-        {/* < EnrollCourse/> */}
+        {/* <TeacherCourses/>
+        < EnrollCourse/> */}
   
         {/* <Maindashboard></Maindashboard> */}
         {/* <TeacherCourses></TeacherCourses> */}

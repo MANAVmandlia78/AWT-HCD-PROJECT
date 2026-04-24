@@ -114,25 +114,6 @@
   background: #fff;
 }
 
-/* ACTIVE STATES — each item gets its accent color */
-.nav-item.active:nth-of-type(1)  { background: #fff5f9; }
-.nav-item.active:nth-of-type(2)  { background: #f5f7ff; }
-.nav-item.active:nth-of-type(3)  { background: #fffbf0; }
-.nav-item.active:nth-of-type(4)  { background: #f0fdf8; }
-.nav-item.active:nth-of-type(5)  { background: #faf5ff; }
-.nav-item.active:nth-of-type(8)  { background: #fff5f9; }
-.nav-item.active:nth-of-type(9)  { background: #f5f7ff; }
-.nav-item.active:nth-of-type(10) { background: #fffbf0; }
-
-/* Active left stripe colors */
-.nav-item.active:nth-of-type(1)::before  { background: #ff6b9d; }
-.nav-item.active:nth-of-type(2)::before  { background: #6b8eff; }
-.nav-item.active:nth-of-type(3)::before  { background: #ffc96b; }
-.nav-item.active:nth-of-type(4)::before  { background: #6bddaa; }
-.nav-item.active:nth-of-type(5)::before  { background: #b06bff; }
-.nav-item.active:nth-of-type(8)::before  { background: #ff6b9d; }
-.nav-item.active:nth-of-type(9)::before  { background: #6b8eff; }
-.nav-item.active:nth-of-type(10)::before { background: #ffc96b; }
 
 /* NAV ICON */
 .nav-icon {
