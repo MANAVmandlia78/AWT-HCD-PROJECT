@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useParams, useNavigate } from "react-router-dom";
 import "../Styles/announcements.css";
 
 const TeacherAnnouncements = () => {
   const [courses, setCourses] = useState([]);
   const [form, setForm] = useState({ title: "", message: "", course_id: "" });
-
+  const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
   useEffect(() => { fetchCourses(); }, []);
@@ -38,12 +39,21 @@ const TeacherAnnouncements = () => {
       <div className="gradient-mid" />
 
       <span className="announcements-page-title">Announcements</span>
+      <button
+        className="back-btn"
+        onClick={() => navigate(-1)}
+      >
+        ⬅ Back
+      </button>
+      
 
       {/* ── Create Announcement Card ── */}
       <div className="ann-card">
+        
         <div className="ann-card-topbar pink">
           <span className="ann-card-label">Create Announcement</span>
         </div>
+        
 
         <div className="ann-card-body">
           <div className="ann-field">

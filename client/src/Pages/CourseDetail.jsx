@@ -17,16 +17,11 @@ const CourseDetail = () => {
     fetchUser();
   }, [id]);
 
-  // FETCH COURSE
   const fetchCourse = async () => {
     try {
       const res = await axios.get(
         `http://localhost:8000/api/courses/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       setCourse(res.data);
     } catch (err) {
@@ -34,53 +29,44 @@ const CourseDetail = () => {
     }
   };
 
-  // FETCH USER ROLE
   const fetchUser = async () => {
     try {
       const res = await axios.get(
         "http://localhost:8000/api/auth/me",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-
-      console.log("USER ROLE:", res.data.role);
       setRole(res.data.role);
     } catch (err) {
       console.log(err);
     }
   };
 
-  // ✅ FIXED CLICK HANDLER
   const handleFeatureClick = (title) => {
-    if (!role) {
-      alert("User role not loaded yet");
-      return;
-    }
+    if (!role) { alert("User role not loaded yet"); return; }
 
-    // 🔥 ASSIGNMENTS
     if (title === "Assignments") {
-      if (role === "teacher") {
-        navigate(`/teacher-assignments/${id}`);
-      } else {
-        navigate(`/assignments/${id}`);
-      }
+      role === "teacher"
+        ? navigate(`/teacher-assignments/${id}`)
+        : navigate(`/assignments/${id}`);
     }
 
-    // 🔥 QUIZZES (FIXED)
     if (title === "Quizzes") {
-      if (role === "teacher") {
-        navigate(`/teacher-quiz/${id}`);
-      } else {
-        navigate(`/quizzes/${id}`);
-      }
+      role === "teacher"
+        ? navigate(`/teacher-quiz/${id}`)
+        : navigate(`/quizzes/${id}`);
     }
 
-     if (title === "Live Classes") {
-    navigate("/home");
-  }
+    if (title === "Announcements") {
+      role === "teacher"
+        ? navigate(`/teacher-announcements/${id}`)
+        : navigate(`/announcements/${id}`);
+    }
+
+    if (title === "Materials") {
+      role === "teacher"
+        ? navigate(`/teacher/materials/${id}`)
+        : navigate(`/materials/${id}`);
+    }
   };
 
   if (!course) return <p>Loading...</p>;
@@ -97,8 +83,8 @@ const CourseDetail = () => {
       image: "/quiz-image.png",
     },
     {
-      title: "Live Classes",
-      desc: "Join live sessions",
+      title: "Materials",
+      desc: "Lecture slides & files",
       image: "/live-image.png",
     },
     {
@@ -146,7 +132,7 @@ const CourseDetail = () => {
         <ul>
           <li>Assignment uploaded</li>
           <li>Quiz scheduled</li>
-          <li>Live class upcoming</li>
+          <li>New material available</li>
         </ul>
       </div>
 

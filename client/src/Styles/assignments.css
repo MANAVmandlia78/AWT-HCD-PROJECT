@@ -131,14 +131,14 @@
 
 /* Past — teal topbar */
 .assignment-section:nth-child(4) h3 {
-  background: linear-gradient(135deg, #f0fdf8, #e0faf0);
+  background: linear-gradient(135deg, #fdf0fd, #fbd0fc);
 }
 .assignment-section:nth-child(4) h3::before {
   content: '';
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #6bddaa;
+  background: #dd6bd9;
   border: 1.5px solid #000;
   flex-shrink: 0;
 }
@@ -160,8 +160,8 @@
 
 /* Left stripe per row — inherits section color */
 .assignment-section:nth-child(2) .assignment-row::before { background: #ff6b9d; }
-.assignment-section:nth-child(3) .assignment-row::before { background: #6b8eff; }
-.assignment-section:nth-child(4) .assignment-row::before { background: #6bddaa; }
+.assignment-section:nth-child(3) .assignment-row::before { background: #ff6b9d; }
+.assignment-section:nth-child(4) .assignment-row::before { background: #ff6b9d }
 
 .assignment-row::before {
   content: "";
@@ -172,9 +172,9 @@
   width: 4px;
 }
 
-.assignment-section:nth-child(2) .assignment-row:hover { background: #fff5f9; transform: translateX(4px); }
-.assignment-section:nth-child(3) .assignment-row:hover { background: #f5f7ff; transform: translateX(4px); }
-.assignment-section:nth-child(4) .assignment-row:hover { background: #f0fdf8; transform: translateX(4px); }
+.assignment-section:nth-child(2) .assignment-row:hover { background: #fcb3d0; transform: translateX(4px); }
+.assignment-section:nth-child(3) .assignment-row:hover { background: #fef5ff; transform: translateX(4px); }
+.assignment-section:nth-child(4) .assignment-row:hover { background: #fcf0fd; transform: translateX(4px); }
 
 /* ─── INFO ──────────────────────────────────────────── */
 .assignment-info {
@@ -288,6 +288,40 @@
   margin-right: 8px;
   cursor: pointer;
   transition: opacity 0.15s ease;
+}
+
+/* ─── BACK BUTTON ───────────────────────────────────── */
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 8px 18px;
+
+  background: #fff;
+  color: #000;
+
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  border: 2px solid #000;
+  border-radius: 8px;
+
+  cursor: pointer;
+
+  box-shadow: 3px 3px 0 #000;
+
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  margin-bottom: 20px;
+}
+
+/* Hover effect (same feel as your buttons) */
+.back-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 #000;
 }
 
 .assignment-actions input[type="file"]::file-selector-button:hover {

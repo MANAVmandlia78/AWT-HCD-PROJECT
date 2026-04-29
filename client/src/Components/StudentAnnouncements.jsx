@@ -1,36 +1,46 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useParams, useNavigate } from "react-router-dom";
 import "../Styles/announcements.css";
 
 const StudentAnnouncements = () => {
   const [announcements, setAnnouncements] = useState([]);
   const token = localStorage.getItem("token");
+  const navigate = useNavigate();
+  const { id } = useParams(); // 👈 THIS IS YOUR COURSE ID
 
-  useEffect(() => { fetchAnnouncements(); }, []);
+  useEffect(() => {
+    fetchAnnouncements();
+  }, [id]); // refetch when course changes
 
   const fetchAnnouncements = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:8000/api/announcements",
+        `http://localhost:8000/api/announcements?course_id=${id}`, // 👈 USE id
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setAnnouncements(res.data);
-    } catch (err) { console.log(err); }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
     <div className="announcements-container">
 
-      {/* Ambient gradient blob */}
       <div className="gradient-mid" />
 
-      <span className="announcements-page-title">Announcements</span>
-
       <div className="ann-list">
-        <p className="ann-list-heading">All Announcements</p>
+        <button
+        className="back-btn"
+        onClick={() => navigate(-1)}
+      >
+        ⬅ Back
+      </button>
+        <p className="ann-list-heading">Course Announcements</p>
 
         {announcements.length === 0 ? (
-          <div className="ann-empty">No announcements yet</div>
+          <div className="ann-empty">No announcements for this course</div>
         ) : (
           announcements.map((a) => (
             <div key={a.id} className="ann-item">
@@ -44,10 +54,10 @@ const StudentAnnouncements = () => {
 
                 <div className="ann-item-meta">
                   <span className="ann-meta-pill course">
-                    📚 {a.course_name}
+                    Course : {a.course_name}
                   </span>
                   <span className="ann-meta-pill teacher">
-                    👤 {a.teacher_name}
+                    Teacher : {a.teacher_name}
                   </span>
                 </div>
 

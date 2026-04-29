@@ -4,24 +4,28 @@ import { TfiDashboard } from "react-icons/tfi";
 import { FaBook } from "react-icons/fa6";
 import { RiLiveLine } from "react-icons/ri";
 import { FaRegCalendarAlt } from "react-icons/fa";
-import { MdNotificationsActive } from "react-icons/md";
 import { IoPersonCircleOutline } from "react-icons/io5";
-import { MdOutlineSettings } from "react-icons/md";
 import { CiLogout } from "react-icons/ci";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const Sidebar = () => {
-  const [active, setActive] = useState("Courses");
+  const [active, setActive] = useState("Dashboard");
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  // ✅ ADD PATHS HERE
+  const role = user?.role; // ✅ get role from auth context (same pattern as CourseDetail)
+
   const menuItems = [
     { name: "Dashboard", icon: <TfiDashboard />, path: "/dashboard" },
     { name: "LiveClasses", icon: <RiLiveLine />, path: "/home" },
     { name: "Calendar", icon: <FaRegCalendarAlt />, path: "/calendar" },
-    // { name: "Announcements", icon: <MdNotificationsActive />, path: "/announcements", badge: 3 },
+    {
+      name: "Courses",
+      icon: <FaBook />,
+      // ✅ route depends on role
+      path: role === "teacher" ? "/teacher-courses" : "/enroll-course",
+    },
   ];
 
   const accountItems = [
@@ -34,7 +38,6 @@ const Sidebar = () => {
     navigate("/login");
   };
 
-  // ✅ MAIN NAVIGATION FUNCTION
   const handleNav = (item) => {
     setActive(item.name);
     navigate(item.path);
@@ -64,7 +67,7 @@ const Sidebar = () => {
         <div
           key={item.name}
           className={`nav-item ${active === item.name ? "active" : ""}`}
-          onClick={() => handleNav(item)}   // ✅ FIXED HERE
+          onClick={() => handleNav(item)}
         >
           <span className="nav-icon">{item.icon}</span>
           <span>{item.name}</span>
@@ -72,6 +75,7 @@ const Sidebar = () => {
         </div>
       ))}
 
+      {/* ACCOUNT ITEMS */}
       {accountItems.map((item) => (
         <div
           key={item.name}

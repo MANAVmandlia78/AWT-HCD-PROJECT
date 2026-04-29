@@ -46,22 +46,6 @@ const Maindashboard = () => {
 
       <div className="gradient-mid" />
 
-      {/* TOPBAR */}
-      <header className="topbar">
-        <div className="topbar-title">COURSES</div>
-
-        <div className="search-box">
-          <input type="text" placeholder="SEARCH..." />
-        </div>
-
-        <div className="topbar-actions">
-          <div className="icon-btn">
-            <MdNotificationsActive />
-            <span className="notif-dot"></span>
-          </div>
-        </div>
-      </header>
-
       {/* CONTENT */}
       <main className="content">
         <div className="courses-grid">

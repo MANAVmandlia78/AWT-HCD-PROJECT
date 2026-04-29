@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { storage } from "../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import katex from "katex";
@@ -66,6 +66,8 @@ const makeQuestion = () => ({
 ───────────────────────────────────────── */
 const TeacherQuiz = () => {
   const { id } = useParams();
+  const navigate = useNavigate(); // ✅ FIXED: moved inside the component
+
   const [title, setTitle] = useState("");
   const [numQuestions, setNumQuestions] = useState(10);
   const [questions, setQuestions] = useState([]);
@@ -169,6 +171,14 @@ const TeacherQuiz = () => {
 
   return (
     <div className="teacherquiz-container">
+      {/* ✅ Back button — navigate(-1) goes to the previous page */}
+      <button
+        className="back-btn"
+        onClick={() => navigate(-1)}
+      >
+        ⬅ Back
+      </button>
+
       <div className="gradient-mid" />
       <span className="teacherquiz-title">Create Quiz</span>
 
@@ -207,7 +217,7 @@ const TeacherQuiz = () => {
               <strong>Equation support:</strong> Wrap inline math in{" "}
               <code>$...$</code> and block equations in <code>$$...$$</code>.
               Example: <code>$x^2 + y^2 = r^2$</code> or{" "}
-              <code>$$\frac{"{"}}a{"}"}{"{"}}b{"}"}</code>$$. Click{" "}
+              <code>$\frac{"{a}"}{"{b}"}$</code>. Click{" "}
               <em>∑ Preview</em> on any question to see it rendered.
             </div>
           </div>

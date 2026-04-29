@@ -476,6 +476,41 @@
   line-height: 1.6;
 }
 
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 3;
+
+  padding: 8px 18px;
+
+  background: #fff;
+  color: #000;
+
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  border: 2px solid #000;
+  border-radius: 8px;
+
+  cursor: pointer;
+
+  box-shadow: 3px 3px 0 #000;
+
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  margin-bottom: 20px;
+}
+
+/* Hover effect (same feel as your buttons) */
+.back-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 #000;
+}
+
+
 .latex-hint-text strong {
   font-weight: 900;
   color: #000;

@@ -37,6 +37,12 @@ const QuizList = () => {
         <p className="quizlist-empty">No quizzes available</p>
       ) : (
         <div className="quizlist-grid">
+          <button
+        className="back-btn"
+        onClick={() => navigate(-1)}
+      >
+        ⬅ Back
+      </button>
           {quizzes.map((quiz) => (
             <div key={quiz.id} className="quiz-card">
 

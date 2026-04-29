@@ -58,6 +58,12 @@ const TeacherAssignments = () => {
 
       {/* Ambient gradient blob */}
       <div className="gradient-mid" />
+      <button
+        className="back-btn"
+        onClick={() => navigate(-1)}
+      >
+        ⬅ Back
+      </button>
 
       <h2 className="title">Your Assignments</h2>
 
