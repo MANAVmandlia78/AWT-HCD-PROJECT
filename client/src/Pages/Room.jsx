@@ -72,6 +72,8 @@ const Room = () => {
   const [audioUnlocked, setAudioUnlocked] = useState(false);
 
   const roleRef = useRef(getRoleFromToken());
+  const isTeacher = roleRef.current === "teacher";
+
   const peersRef = useRef(new Map());
   const participantsRef = useRef([]);
   const remoteStreamRef = useRef(null);
@@ -92,7 +94,6 @@ const Room = () => {
     v.play()
       .then(() => setAudioUnlocked(true))
       .catch(() => {
-        // Browser blocked autoplay with audio — mute and try again, show banner
         v.muted = true;
         v.play().catch(() => {});
         setAudioUnlocked(false);
@@ -157,6 +158,12 @@ const Room = () => {
   }, [addTracks, createPeerConnection, socket]);
 
   const startScreenShare = async () => {
+    // ── Guard: only teachers can share ──
+    if (!isTeacher) {
+      dispatch({ type: "SET_NOTICE", payload: "Only teachers can share their screen." });
+      setTimeout(() => dispatch({ type: "SET_NOTICE", payload: "" }), 3000);
+      return;
+    }
     if (!socket?.id) return;
     if (currentSharer && currentSharer.socketId !== socket.id) {
       dispatch({ type: "SET_NOTICE", payload: "Another user is already sharing" });
@@ -316,7 +323,7 @@ const Room = () => {
               onClick={() => setRightPanel("clipboard")}
             >
               📋 Clipboard
-              {roleRef.current === "teacher" && <span className="room-panel-tab-dot" />}
+              {isTeacher && <span className="room-panel-tab-dot" />}
             </button>
           </div>
 
@@ -350,15 +357,21 @@ const Room = () => {
           </div>
         </div>
 
-        {/* CENTER — Share button */}
+        {/* CENTER — Share button (teachers only) */}
         <div className="room-ctrl-group room-ctrl-group--center">
-          <button
-            className={`room-ctrl-share-btn ${isSharing ? "stop" : "start"}`}
-            onClick={isSharing ? stopScreenShare : startScreenShare}
-          >
-            <span className="room-ctrl-share-icon">{isSharing ? "⏹" : "🖥"}</span>
-            {isSharing ? "Stop Sharing" : "Share Screen"}
-          </button>
+          {isTeacher ? (
+            <button
+              className={`room-ctrl-share-btn ${isSharing ? "stop" : "start"}`}
+              onClick={isSharing ? stopScreenShare : startScreenShare}
+            >
+              <span className="room-ctrl-share-icon">{isSharing ? "⏹" : "🖥"}</span>
+              {isSharing ? "Stop Sharing" : "Share Screen"}
+            </button>
+          ) : (
+            <div className="room-ctrl-student-label">
+              👨‍🎓 Viewing Session
+            </div>
+          )}
         </div>
 
         {/* RIGHT — Volume */}

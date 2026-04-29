@@ -62,7 +62,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 60px 48px;
+  padding: 64px 56px;
   position: relative;
   z-index: 1;
 }
@@ -70,8 +70,9 @@
 .home-left-inner {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  max-width: 420px;
+  gap: 24px;
+  max-width: 400px;
+  width: 100%;
 }
 
 /* Logo mark */
@@ -86,6 +87,7 @@
   justify-content: center;
   background: #fff;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .logo-mark svg {
@@ -100,26 +102,14 @@
   color: #000;
   letter-spacing: -0.03em;
   line-height: 1;
-  position: relative;
-}
-
-/* Rainbow underline on brand */
-.home-brand::after {
-  content: "";
-  display: block;
-  margin-top: 6px;
-  height: 4px;
-  width: 100%;
-  /* background: linear-gradient(90deg, #ff6b9d, #6b8eff, #ffc96b, #6bddaa, #b06bff); */
-  border-radius: 2px;
 }
 
 .home-tagline {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
-  color: #000000;
+  color: #444;
   letter-spacing: 0.02em;
-  margin-top: -6px;
+  margin-top: 8px;
 }
 
 /* Feature list */
@@ -127,14 +117,13 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-top: 8px;
 }
 
 .feature-item {
   font-size: 13px;
   font-weight: 700;
-  color: #333;
-  padding: 12px 16px;
+  color: #222;
+  padding: 12px 16px 12px 20px;
   border: 2px solid #000;
   border-radius: 10px;
   background: #fff;
@@ -142,6 +131,7 @@
   transition: transform 0.15s ease, box-shadow 0.15s ease;
   position: relative;
   overflow: hidden;
+  cursor: default;
 }
 
 .feature-item::before {
@@ -157,9 +147,7 @@
 .feature-item:nth-child(2)::before { background: #6b8eff; }
 .feature-item:nth-child(3)::before { background: #6bddaa; }
 
-.feature-item:nth-child(1):hover { background: #fff5f9; transform: translateX(4px); box-shadow: 3px 3px 0 #000; }
-.feature-item:nth-child(2):hover { background: #f5f7ff; transform: translateX(4px); box-shadow: 3px 3px 0 #000; }
-.feature-item:nth-child(3):hover { background: #f0fdf8; transform: translateX(4px); box-shadow: 3px 3px 0 #000; }
+.feature-item:hover { transform: translateX(4px); }
 
 /* ─── VERTICAL DIVIDER ───────────────────────────────── */
 .home-divider {
@@ -175,7 +163,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 60px 48px;
+  padding: 64px 56px;
   position: relative;
   z-index: 1;
 }
@@ -183,13 +171,19 @@
 /* ─── CARD ───────────────────────────────────────────── */
 .home-card {
   width: 100%;
-  max-width: 400px;
+  max-width: 380px;
   background: #fff;
   border: 2px solid #000;
   border-radius: 16px;
   box-shadow: 6px 6px 0 #000;
   overflow: hidden;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  /* ── card body spacing via flex ── */
+  display: flex;
+  flex-direction: column;
+  padding: 28px 28px 32px;
+  gap: 0; /* controlled per-element below */
 }
 
 .home-card:hover {
@@ -197,25 +191,27 @@
   box-shadow: 9px 9px 0 #000;
 }
 
-/* Rainbow top stripe */
+/* Rainbow top stripe — sits outside padding via negative margin trick */
 .home-card::before {
   content: "";
   display: block;
   height: 5px;
   background: linear-gradient(90deg, #ff6b9d, #6b8eff, #ffc96b, #6bddaa, #b06bff);
+  /* pull it to full width ignoring parent padding */
+  margin: -28px -28px 24px -28px;
 }
 
-/* Card title */
+/* ─── CARD TITLE ─────────────────────────────────────── */
 .card-title {
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.15em;
   text-transform: uppercase;
   color: #000;
-  padding: 18px 28px 0;
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-bottom: 6px;
 }
 
 .card-title::before {
@@ -228,22 +224,133 @@
   flex-shrink: 0;
 }
 
-/* Card body */
-.home-card-body {
-  padding: 20px 28px 28px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+/* ─── CARD SUBTITLE ──────────────────────────────────── */
+.card-subtitle {
+  font-size: 13px;
+  color: #555;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.card-subtitle strong {
+  color: #000;
+}
+
+/* ─── ROLE BADGE ─────────────────────────────────────── */
+.role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .3px;
+  margin-bottom: 16px; /* space below badge before next section */
+}
+
+.role-badge--teacher {
+  background: rgba(43, 139, 232, .1);
+  color: #1a7dd4;
+  border: 1.5px solid rgba(43, 139, 232, .3);
+}
+
+.role-badge--student {
+  background: rgba(63, 185, 80, .1);
+  color: #2da044;
+  border: 1.5px solid rgba(63, 185, 80, .3);
+}
+
+/* ─── ROOM CODE DISPLAY ──────────────────────────────── */
+.room-code-display {
+  background: #f6f8fa;
+  border: 2px dashed #c9d1d9;
+  border-radius: 12px;
+  padding: 22px 16px;
+  text-align: center;
+  margin-bottom: 16px; /* gap between code box and button */
+}
+
+.room-code-label {
+  font-size: 10px;
+  color: #6e7681;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.room-code-value {
+  font-size: 32px;
+  font-weight: 800;
+  color: #2B8BE8;
+  letter-spacing: 6px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  margin-bottom: 10px;
+}
+
+.room-code-sub {
+  font-size: 11px;
+  color: #8b949e;
+  font-weight: 700;
+}
+
+/* ─── BUTTONS ────────────────────────────────────────── */
+.home-btn {
+  display: block;
+  width: 100%;
+  padding: 13px;
+  border-radius: 10px;
+  border: 2px solid #000;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 #000;
+  transition: background .15s, transform .15s, box-shadow .15s;
+  font-family: 'Comic Neue', sans-serif;
+}
+
+.home-btn--primary {
+  background: linear-gradient(135deg, #ff6b9d, #b06bff);
+  color: #fff;
+  margin-bottom: 10px; /* gap between primary and secondary */
+}
+
+.home-btn--primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #ff4d7e, #9b4dff);
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 #000;
+}
+
+.home-btn--primary:disabled {
+  opacity: .42;
+  cursor: not-allowed;
+  box-shadow: 2px 2px 0 #000;
+}
+
+.home-btn--secondary {
+  background: #f0f0f0;
+  color: #222;
+}
+
+.home-btn--secondary:hover {
+  background: #e2e2e2;
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 #000;
 }
 
 /* ─── FIELD GROUP ────────────────────────────────────── */
 .field-group {
   border: 2px solid #000;
   border-radius: 10px;
-  padding: 12px 16px;
-  transition: background 0.15s ease, transform 0.15s ease;
+  padding: 14px 16px;
+  transition: background 0.15s ease;
   position: relative;
   overflow: hidden;
+  margin-bottom: 16px; /* space between input and button */
 }
 
 .field-group::before {
@@ -253,13 +360,10 @@
   top: 0;
   bottom: 0;
   width: 4px;
+  background: #ff6b9d;
 }
 
-.field-group:nth-of-type(1)::before { background: #ff6b9d; }
-.field-group:nth-of-type(2)::before { background: #6b8eff; }
-
-.field-group:nth-of-type(1):focus-within { background: #fff5f9; }
-.field-group:nth-of-type(2):focus-within { background: #f5f7ff; }
+.field-group:focus-within { background: #fff5f9; }
 
 .field-group label {
   display: block;
@@ -268,14 +372,14 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: #888;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .field-group input {
   width: 100%;
   border: none;
   outline: none;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
   color: #000;
   background: transparent;
@@ -287,51 +391,13 @@
   font-weight: 500;
 }
 
-/* ─── SUBMIT BUTTON ──────────────────────────────────── */
-.home-card button {
-  width: 100%;
-  padding: 14px;
-  background: linear-gradient(135deg, #ff6b9d, #b06bff);
-  color: #fff;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  border: 2px solid #000;
-  border-radius: 8px;
-  cursor: pointer;
-  box-shadow: 4px 4px 0 #000;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-  font-family: 'Comic Neue', sans-serif;
-}
-
-.home-card button:hover:not(:disabled) {
-  transform: translate(-3px, -3px);
-  box-shadow: 7px 7px 0 #000;
-  background: linear-gradient(135deg, #ff4d7e, #9b4dff);
-}
-
-.home-card button:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-  box-shadow: 2px 2px 0 #000;
-}
-
 /* ─── RESPONSIVE ─────────────────────────────────────── */
 @media (max-width: 768px) {
-  .home-root {
-    flex-direction: column;
-  }
-
-  .home-left {
-    padding: 40px 24px 20px;
-  }
-
-  .home-right {
-    padding: 20px 24px 40px;
-  }
-
-  .home-brand {
-    font-size: 28px;
-  }
+  .home-root { flex-direction: column; }
+  .home-left { padding: 40px 24px 24px; }
+  .home-right { padding: 24px 24px 48px; }
+  .home-divider { width: 100%; height: 2px; align-self: auto; }
+  .home-brand { font-size: 30px; }
+  .home-card { padding: 24px 20px 28px; }
+  .home-card::before { margin: -24px -20px 20px -20px; }
 }
