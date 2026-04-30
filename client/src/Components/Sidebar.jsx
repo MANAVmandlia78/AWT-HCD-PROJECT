@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../Styles/sidebar.css";
+import "../Styles/Sidebar.css";
 import { TfiDashboard } from "react-icons/tfi";
 import { FaBook } from "react-icons/fa6";
 import { RiLiveLine } from "react-icons/ri";
