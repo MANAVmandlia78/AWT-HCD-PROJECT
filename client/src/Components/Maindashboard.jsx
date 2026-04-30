@@ -22,11 +22,14 @@ const Maindashboard = () => {
 
   const fetchCourses = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/api/courses", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+  const res = await axios.get(
+    `${import.meta.env.VITE_API_URL}/api/courses`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
 
       // 🔥 Add random image to each course
       const updated = res.data.map((course) => ({

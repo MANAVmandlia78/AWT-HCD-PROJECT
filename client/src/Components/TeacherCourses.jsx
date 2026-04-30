@@ -12,33 +12,36 @@ const TeacherCourses = () => {
   useEffect(() => {
     fetchCourses();
   }, []);
+const fetchCourses = async () => {
+  const res = await axios.get(
+    `${import.meta.env.VITE_API_URL}/api/courses`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  setCourses(res.data);
+};
 
-  const fetchCourses = async () => {
-    const res = await axios.get("http://localhost:8000/api/courses", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    setCourses(res.data);
-  };
-
-  const handleCreate = async () => {
-    try {
-      if (!title) { alert("Title required"); return; }
-
-      const res = await axios.post(
-        "http://localhost:8000/api/courses",
-        { title, description },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      alert(`Course Created ✅\nCode: ${res.data.enrollment_code}`);
-      setTitle("");
-      setDescription("");
-      fetchCourses();
-    } catch (err) {
-      console.log(err);
-      alert("Failed ❌");
+const handleCreate = async () => {
+  try {
+    if (!title) { 
+      alert("Title required"); 
+      return; 
     }
-  };
+
+    const res = await axios.post(
+      `${import.meta.env.VITE_API_URL}/api/courses`,
+      { title, description },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    alert(`Course Created ✅\nCode: ${res.data.enrollment_code}`);
+    setTitle("");
+    setDescription("");
+    fetchCourses();
+  } catch (err) {
+    console.log(err);
+    alert("Failed ❌");
+  }
+};
 
   return (
     <div className="courses-container">

@@ -11,26 +11,31 @@ const TeacherAnnouncements = () => {
 
   useEffect(() => { fetchCourses(); }, []);
 
-  const fetchCourses = async () => {
-    try {
-      const res = await axios.get("http://localhost:8000/api/courses", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setCourses(res.data);
-    } catch (err) { console.log(err); }
-  };
+const fetchCourses = async () => {
+  try {
+    const res = await axios.get(
+      `${import.meta.env.VITE_API_URL}/api/courses`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    setCourses(res.data);
+  } catch (err) { 
+    console.log(err); 
+  }
+};
 
-  const handleSubmit = async () => {
-    try {
-      await axios.post(
-        "http://localhost:8000/api/announcements",
-        form,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      alert("Announcement posted ✅");
-      setForm({ title: "", message: "", course_id: "" });
-    } catch (err) { console.log(err); }
-  };
+const handleSubmit = async () => {
+  try {
+    await axios.post(
+      `${import.meta.env.VITE_API_URL}/api/announcements`,
+      form,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    alert("Announcement posted ✅");
+    setForm({ title: "", message: "", course_id: "" });
+  } catch (err) { 
+    console.log(err); 
+  }
+};
 
   return (
     <div className="announcements-container">

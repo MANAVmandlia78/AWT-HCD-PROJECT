@@ -26,8 +26,7 @@ const AssignmentDetail = () => {
 
   const fetchAssignment = async () => {
   try {
-    const res = await axios.get(
-      `http://localhost:8000/api/assignments/detail/${assignmentId}`,
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/assignments/detail/${assignmentId}`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
@@ -79,8 +78,7 @@ const AssignmentDetail = () => {
         },
         async () => {
           const fileUrl = await getDownloadURL(uploadTask.snapshot.ref);
-          await axios.post(
-            "http://localhost:8000/api/submissions",
+          await axios.post(`${import.meta.env.VITE_API_URL}/api/submissions`,
             { assignment_id: assignmentId, file_url: fileUrl },
             { headers: { Authorization: `Bearer ${token}` } }
           );

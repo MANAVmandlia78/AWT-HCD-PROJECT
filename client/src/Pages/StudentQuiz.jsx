@@ -58,54 +58,56 @@ const StudentQuiz = () => {
 
   useEffect(() => { if (id) checkSubmission(); }, [id]);
 
-  const checkSubmission = async () => {
-    try {
-      const res = await axios.get(
-        `http://localhost:8000/api/quizzes/${id}/result`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      if (res.data.attempted) {
-        setAttempted(true);
-        setScore(res.data.score);
-        setLoading(false);
-      } else {
-        fetchQuiz(id);
-      }
-    } catch (err) {
-      console.log(err);
-      setLoading(false);
-    }
-  };
-
-  const fetchQuiz = async (quizId) => {
-    try {
-      const res = await axios.get(`http://localhost:8000/api/quizzes/${quizId}`);
-      setQuestions(res.data);
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSelect = (questionId, option) => {
-    setAnswers((prev) => ({ ...prev, [questionId]: option }));
-  };
-
-  const handleSubmit = async () => {
-    try {
-      const res = await axios.post(
-        "http://localhost:8000/api/quizzes/submit",
-        { quiz_id: id, answers },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+ const checkSubmission = async () => {
+  try {
+    const res = await axios.get(
+      `${import.meta.env.VITE_API_URL}/api/quizzes/${id}/result`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    if (res.data.attempted) {
       setAttempted(true);
       setScore(res.data.score);
-    } catch (err) {
-      console.log(err);
-      alert("Submission failed ❌");
+      setLoading(false);
+    } else {
+      fetchQuiz(id);
     }
-  };
+  } catch (err) {
+    console.log(err);
+    setLoading(false);
+  }
+};
+
+const fetchQuiz = async (quizId) => {
+  try {
+    const res = await axios.get(
+      `${import.meta.env.VITE_API_URL}/api/quizzes/${quizId}`
+    );
+    setQuestions(res.data);
+  } catch (err) {
+    console.log(err);
+  } finally {
+    setLoading(false);
+  }
+};
+
+const handleSelect = (questionId, option) => {
+  setAnswers((prev) => ({ ...prev, [questionId]: option }));
+};
+
+const handleSubmit = async () => {
+  try {
+    const res = await axios.post(
+      `${import.meta.env.VITE_API_URL}/api/quizzes/submit`,
+      { quiz_id: id, answers },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    setAttempted(true);
+    setScore(res.data.score);
+  } catch (err) {
+    console.log(err);
+    alert("Submission failed ❌");
+  }
+};
 
   return (
     <div className="studentquiz-container">

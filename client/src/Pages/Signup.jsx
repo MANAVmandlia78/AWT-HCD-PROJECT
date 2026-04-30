@@ -22,14 +22,17 @@ const Signup = () => {
   };
 
   const handleSignup = async () => {
-    try {
-      await axios.post("http://localhost:8000/api/auth/register", form);
-      alert("Signup successful");
-      navigate("/login");
-    } catch (err) {
-      alert(err.response?.data?.message || "Signup failed");
-    }
-  };
+  try {
+    await axios.post(
+      `${import.meta.env.VITE_API_URL}/api/auth/register`,
+      form
+    );
+    alert("Signup successful");
+    navigate("/login");
+  } catch (err) {
+    alert(err.response?.data?.message || "Signup failed");
+  }
+};
 
   return (
     <div className="auth-container">

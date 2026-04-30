@@ -13,17 +13,17 @@ const StudentAnnouncements = () => {
     fetchAnnouncements();
   }, [id]); // refetch when course changes
 
-  const fetchAnnouncements = async () => {
-    try {
-      const res = await axios.get(
-        `http://localhost:8000/api/announcements?course_id=${id}`, // 👈 USE id
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setAnnouncements(res.data);
-    } catch (err) {
-      console.log(err);
-    }
-  };
+const fetchAnnouncements = async () => {
+  try {
+    const res = await axios.get(
+      `${import.meta.env.VITE_API_URL}/api/announcements?course_id=${id}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    setAnnouncements(res.data);
+  } catch (err) {
+    console.log(err);
+  }
+};
 
   return (
     <div className="announcements-container">

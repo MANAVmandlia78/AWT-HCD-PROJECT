@@ -19,39 +19,47 @@ const TeacherAssignments = () => {
   const token = localStorage.getItem("token");
 
   useEffect(() => { fetchAssignments(); }, [id]);
+const fetchAssignments = async () => {
+  try {
+    const res = await axios.get(
+      `${import.meta.env.VITE_API_URL}/api/assignments/${id}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    setAssignments(res.data);
+  } catch (err) { 
+    console.log(err); 
+  }
+};
 
-  const fetchAssignments = async () => {
-    try {
-      const res = await axios.get(
-        `http://localhost:8000/api/assignments/${id}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setAssignments(res.data);
-    } catch (err) { console.log(err); }
-  };
-
-  const handleCreateAssignment = async () => {
-    try {
-      if (!title || !file) { alert("Title and file required"); return; }
-
-      const storageRef = ref(storage, `assignments/${Date.now()}_${file.name}`);
-      await uploadBytes(storageRef, file);
-      const fileUrl = await getDownloadURL(storageRef);
-
-      await axios.post(
-        "http://localhost:8000/api/assignments",
-        { title, description, file_url: fileUrl, due_date: dueDate, course_id: id },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      alert("Assignment created ✅");
-      setTitle(""); setDescription(""); setFile(null); setDueDate("");
-      fetchAssignments();
-    } catch (err) {
-      console.log(err);
-      alert("Failed to create assignment ❌");
+const handleCreateAssignment = async () => {
+  try {
+    if (!title || !file) { 
+      alert("Title and file required"); 
+      return; 
     }
-  };
+
+    const storageRef = ref(storage, `assignments/${Date.now()}_${file.name}`);
+    await uploadBytes(storageRef, file);
+    const fileUrl = await getDownloadURL(storageRef);
+
+    await axios.post(
+      `${import.meta.env.VITE_API_URL}/api/assignments`,
+      { title, description, file_url: fileUrl, due_date: dueDate, course_id: id },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    alert("Assignment created ✅");
+    setTitle(""); 
+    setDescription(""); 
+    setFile(null); 
+    setDueDate("");
+    
+    fetchAssignments();
+  } catch (err) {
+    console.log(err);
+    alert("Failed to create assignment ❌");
+  }
+};
 
   return (
     <div className="teacher-assignments-container">

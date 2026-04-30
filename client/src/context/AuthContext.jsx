@@ -9,15 +9,18 @@ export const AuthProvider = ({ children }) => {
   // 🔥 Fetch user from backend
   const fetchUser = async () => {
     try {
-      const token = localStorage.getItem("token");
+  const token = localStorage.getItem("token");
 
-      if (!token) return;
+  if (!token) return;
 
-      const res = await axios.get("http://localhost:8000/api/auth/me", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+  const res = await axios.get(
+    `${import.meta.env.VITE_API_URL}/api/auth/me`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
 
       setUser(res.data); // ✅ full user object from DB
     } catch (err) {

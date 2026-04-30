@@ -154,10 +154,10 @@ const TeacherQuiz = () => {
     try {
       setSubmitting(true);
       await axios.post(
-        "http://localhost:8000/api/quizzes",
-        { title, questions: payload, course_id: id },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+  `${import.meta.env.VITE_API_URL}/api/quizzes`,
+  { title, questions: payload, course_id: id },
+  { headers: { Authorization: `Bearer ${token}` } }
+);
       alert("Quiz created successfully ✅");
       setTitle("");
       handleNumChange(10);

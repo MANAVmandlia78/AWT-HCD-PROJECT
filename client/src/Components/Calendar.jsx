@@ -16,9 +16,9 @@ const Calendar = () => {
   const fetchAssignments = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:8000/api/student/assignments",
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+  `${import.meta.env.VITE_API_URL}/api/student/assignments`,
+  { headers: { Authorization: `Bearer ${token}` } }
+);
       setAssignments(res.data);
     } catch (err) {
       console.log(err);

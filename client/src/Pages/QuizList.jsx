@@ -14,16 +14,16 @@ const QuizList = () => {
   }, [id]);
 
   const fetchQuizzes = async () => {
-    try {
-      const res = await axios.get(
-        `http://localhost:8000/api/quizzes/course/${id}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setQuizzes(res.data);
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  try {
+    const res = await axios.get(
+      `${import.meta.env.VITE_API_URL}/api/quizzes/course/${id}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    setQuizzes(res.data);
+  } catch (err) {
+    console.log(err);
+  }
+};
 
   return (
     <div className="quizlist-container">

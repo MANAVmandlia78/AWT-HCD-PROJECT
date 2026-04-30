@@ -34,19 +34,19 @@ const StudentMaterials = () => {
 
   useEffect(() => { fetchMaterials(); }, [id]);
 
-  const fetchMaterials = async () => {
-    try {
-      const res = await axios.get(
-        `http://localhost:8000/api/materials/${id}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setMaterials(res.data);
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+const fetchMaterials = async () => {
+  try {
+    const res = await axios.get(
+      `${import.meta.env.VITE_API_URL}/api/materials/${id}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    setMaterials(res.data);
+  } catch (err) {
+    console.log(err);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="materials-container">

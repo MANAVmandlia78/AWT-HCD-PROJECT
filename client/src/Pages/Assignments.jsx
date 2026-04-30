@@ -16,14 +16,14 @@ const Assignments = () => {
 
   const fetchAssignments = async () => {
     try {
-      const res = await axios.get(
-        `http://localhost:8000/api/assignments/${id}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setAssignments(res.data);
-    } catch (err) {
-      console.log(err);
-    }
+  const res = await axios.get(
+    `${import.meta.env.VITE_API_URL}/api/assignments/${id}`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  setAssignments(res.data);
+} catch (err) {
+  console.log(err);
+}
   };
 
   return (

@@ -24,27 +24,27 @@ const Submissions = () => {
     fetchSubmissions();
   }, []);
 
-  const fetchSubmissions = async () => {
-    const res = await axios.get(
-      `http://localhost:8000/api/submissions/${id}`,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    setSubmissions(res.data);
-  };
+const fetchSubmissions = async () => {
+  const res = await axios.get(
+    `${import.meta.env.VITE_API_URL}/api/submissions/${id}`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  setSubmissions(res.data);
+};
 
-  const handleGrade = async (submissionId) => {
-    const grade = gradeMap[submissionId] || "";
-    const feedback = feedbackMap[submissionId] || "";
+const handleGrade = async (submissionId) => {
+  const grade = gradeMap[submissionId] || "";
+  const feedback = feedbackMap[submissionId] || "";
 
-    await axios.put(
-      `http://localhost:8000/api/submissions/${submissionId}`,
-      { grade, feedback },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+  await axios.put(
+    `${import.meta.env.VITE_API_URL}/api/submissions/${submissionId}`,
+    { grade, feedback },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
 
-    setGradedSet((prev) => new Set([...prev, submissionId]));
-    fetchSubmissions();
-  };
+  setGradedSet((prev) => new Set([...prev, submissionId]));
+  fetchSubmissions();
+};
 
   return (
     <div>

@@ -34,15 +34,17 @@ const TeacherMaterials = () => {
 
   useEffect(() => { fetchMaterials(); }, [id]);
 
-  const fetchMaterials = async () => {
-    try {
-      const res = await axios.get(
-        `http://localhost:8000/api/materials/${id}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setMaterials(res.data);
-    } catch (err) { console.log(err); }
-  };
+const fetchMaterials = async () => {
+  try {
+    const res = await axios.get(
+      `${import.meta.env.VITE_API_URL}/api/materials/${id}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    setMaterials(res.data);
+  } catch (err) { 
+    console.log(err); 
+  }
+};
 
   const handleUpload = async () => {
     if (!title || !file) { alert("Title and file required"); return; }
@@ -69,7 +71,7 @@ const TeacherMaterials = () => {
 
         try {
           await axios.post(
-            "http://localhost:8000/api/materials",
+            `${import.meta.env.VITE_API_URL}/api/materials`,
             {
               title,
               description,
@@ -98,17 +100,20 @@ const TeacherMaterials = () => {
   };
 
   const handleDelete = async (materialId) => {
-    if (!window.confirm("Delete this material?")) return;
-    try {
-      await axios.delete(`http://localhost:8000/api/materials/${materialId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setMaterials((prev) => prev.filter((m) => m.id !== materialId));
-    } catch (err) {
-      console.log(err);
-      alert("Failed to delete ❌");
-    }
-  };
+  if (!window.confirm("Delete this material?")) return;
+
+  try {
+    await axios.delete(
+      `${import.meta.env.VITE_API_URL}/api/materials/${materialId}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    setMaterials((prev) => prev.filter((m) => m.id !== materialId));
+  } catch (err) {
+    console.log(err);
+    alert("Failed to delete ❌");
+  }
+};
 
   return (
     <div className="materials-container">
