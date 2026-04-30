@@ -24,17 +24,28 @@ const verifyToken = (req, res, next) => {
     return res.status(401).json({ message: "Invalid token" });
   }
 };
+const cors = require("cors");
+
+// ✅ allow your frontend explicitly (no "*")
+const allowedOrigin =
+  "https://awt-hcd-project-cs7asqxnw-manavmandalia077-7613s-projects.vercel.app";
+
+app.use(cors({
+  origin: allowedOrigin,
+  credentials: true
+}));
+
+// ✅ MUST handle preflight BEFORE routes
 app.use((req, res, next) => {
   if (req.method === "OPTIONS") {
+    res.header("Access-Control-Allow-Origin", allowedOrigin);
+    res.header("Access-Control-Allow-Credentials", "true");
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
     return res.sendStatus(200);
   }
   next();
 });
-
-// ✅ CORS
-app.use(cors({
-  origin: "*"
-}));
 
 // ✅ BODY
 app.use(express.json());
