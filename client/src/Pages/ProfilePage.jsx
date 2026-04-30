@@ -1,5 +1,5 @@
 import React from "react";
-import "../Styles/profile.css";
+import "../Styles/Profile.css";
 import profileMan from "/profile-pic-man.png";
 import profileWoman from "/profile-pic-women.png";
 import { useAuth } from "../context/AuthContext";
