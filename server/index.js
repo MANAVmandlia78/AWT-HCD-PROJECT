@@ -26,8 +26,19 @@ const verifyToken = (req, res, next) => {
   }
 };
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://awt-hcd-project-c7asqxnw-manavmandalia077-7613s-projects.vercel.app"
+];
+
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true
 }));
 app.use(express.json());
