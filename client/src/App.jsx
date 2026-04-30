@@ -71,7 +71,7 @@ const App = () => {
           >
             {/* DASHBOARD */}
             <Route path="dashboard" element={<Maindashboard />} />
-
+            <Route path="/" element={<Maindashboard />} />   
             {/* ✅ CALENDAR (ONLY ADDITION) */}
             <Route path="calendar" element={<Calendar />} />
             <Route path="profile" element={<Profile />} />

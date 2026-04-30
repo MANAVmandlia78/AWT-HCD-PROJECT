@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import "../Styles/auth.css";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -31,126 +32,120 @@ const Signup = () => {
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
+    <div className="auth-container">
+      <div className="gradient-mid" />
 
-        <h2>Signup</h2>
+      <div className="auth-card">
+        {/* Rainbow stripe via CSS ::before */}
 
-        {/* NAME */}
-        <input
-          name="name"
-          placeholder="Full Name"
-          onChange={handleChange}
-          style={styles.input}
-        />
+        {/* Topbar */}
+        <div className="auth-card-topbar">
+          <span className="auth-card-title">Create Account</span>
+        </div>
 
-        {/* EMAIL */}
-        <input
-          name="email"
-          placeholder="Email"
-          onChange={handleChange}
-          style={styles.input}
-        />
+        {/* Brand */}
+        <div className="auth-brand">
+          <span className="auth-brand-name">ClassConnect</span>
+          <span className="auth-brand-sub">Join your classroom today</span>
+        </div>
 
-        {/* PASSWORD */}
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          onChange={handleChange}
-          style={styles.input}
-        />
+        {/* Fields */}
+        <div className="auth-card-body">
 
-        {/* ROLE */}
-        <select name="role" onChange={handleChange} style={styles.input}>
-          <option value="student">Student</option>
-          <option value="teacher">Teacher</option>
-          <option value="admin">Admin</option>
-        </select>
-
-        {/* STUDENT ONLY */}
-        {form.role === "student" && (
-          <>
-            <select name="gender" onChange={handleChange} style={styles.input}>
-              <option value="">Select Gender</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-            </select>
-
+          <div className="auth-field">
+            <label>Full Name</label>
             <input
-              name="enrollment_no"
-              placeholder="Enrollment Number"
+              name="name"
+              placeholder="Enter your full name"
               onChange={handleChange}
-              style={styles.input}
             />
-          </>
-        )}
+          </div>
 
-        {/* COMMON */}
-        <select name="college_id" onChange={handleChange} style={styles.input}>
-          <option value="">Select College</option>
-          <option value="1">ABC College</option>
-          <option value="2">XYZ University</option>
-        </select>
+          <div className="auth-field">
+            <label>Email Address</label>
+            <input
+              name="email"
+              placeholder="you@example.com"
+              onChange={handleChange}
+            />
+          </div>
 
-        <select name="department_id" onChange={handleChange} style={styles.input}>
-          <option value="">Select Department</option>
-          <option value="1">Computer Engineering</option>
-          <option value="2">IT</option>
-          <option value="3">Mechanical</option>
-        </select>
+          <div className="auth-field">
+            <label>Password</label>
+            <input
+              type="password"
+              name="password"
+              placeholder="••••••••"
+              onChange={handleChange}
+            />
+          </div>
 
-        <button onClick={handleSignup} style={styles.button}>
-          Signup
-        </button>
+          <div className="auth-field">
+            <label>Role</label>
+            <select name="role" onChange={handleChange}>
+              <option value="student">Student</option>
+              <option value="teacher">Teacher</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
 
-        <p>
-          Already have an account?{" "}
-          <span onClick={() => navigate("/login")} style={styles.link}>
-            Login
-          </span>
-        </p>
+          {/* Student only fields */}
+          {form.role === "student" && (
+            <>
+              <div className="auth-field">
+                <label>Gender</label>
+                <select name="gender" onChange={handleChange}>
+                  <option value="">Select Gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                </select>
+              </div>
 
+              <div className="auth-field">
+                <label>Enrollment Number</label>
+                <input
+                  name="enrollment_no"
+                  placeholder="e.g. 92301733067"
+                  onChange={handleChange}
+                />
+              </div>
+            </>
+          )}
+
+          <div className="auth-field">
+            <label>College</label>
+            <select name="college_id" onChange={handleChange}>
+              <option value="">Select College</option>
+              <option value="1">ABC College</option>
+              <option value="2">XYZ University</option>
+            </select>
+          </div>
+
+          <div className="auth-field">
+            <label>Department</label>
+            <select name="department_id" onChange={handleChange}>
+              <option value="">Select Department</option>
+              <option value="1">Computer Engineering</option>
+              <option value="2">IT</option>
+              <option value="3">Mechanical</option>
+            </select>
+          </div>
+
+          <button className="auth-submit-btn" onClick={handleSignup}>
+            Create Account
+          </button>
+
+          <p className="auth-footer">
+            Already have an account?{" "}
+            <button className="auth-link" onClick={() => navigate("/login")}>
+              Login
+            </button>
+          </p>
+
+        </div>
       </div>
     </div>
   );
 };
 
 export default Signup;
-
-// 🔥 minimal brutalism style
-const styles = {
-  container: {
-    height: "100vh",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    background: "#f8f8f8",
-  },
-  card: {
-    padding: "30px",
-    border: "2px solid black",
-    boxShadow: "6px 6px 0 black",
-    background: "white",
-    width: "320px",
-    textAlign: "center",
-  },
-  input: {
-    width: "100%",
-    padding: "10px",
-    margin: "8px 0",
-    border: "2px solid black",
-  },
-  button: {
-    width: "100%",
-    padding: "10px",
-    background: "black",
-    color: "white",
-    border: "none",
-    cursor: "pointer",
-  },
-  link: {
-    color: "blue",
-    cursor: "pointer",
-  },
-};

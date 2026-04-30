@@ -1,16 +1,14 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext"; // ✅ ADD THIS
+import { useAuth } from "../context/AuthContext";
+import "../Styles/auth.css";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login } = useAuth(); // ✅ from context
+  const { login } = useAuth();
 
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-  });
+  const [form, setForm] = useState({ email: "", password: "" });
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -18,97 +16,72 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
-      const res = await axios.post(
-        "http://localhost:8000/api/auth/login",
-        form
-      );
-
-      // ✅ ONLY PASS TOKEN
+      const res = await axios.post("http://localhost:8000/api/auth/login", form);
       login(res.data.token);
-
-      // ❌ REMOVE manual localStorage (context handles it)
-
-      // ✅ redirect
       navigate("/dashboard");
-
     } catch (err) {
       alert(err.response?.data?.message || "Login failed");
     }
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <h2>Login</h2>
+    <div className="auth-container">
+      <div className="gradient-mid" />
 
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={form.email}
-          onChange={handleChange}
-          style={styles.input}
-        />
+      <div className="auth-card">
+        {/* Rainbow stripe via CSS ::before */}
 
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={form.password}
-          onChange={handleChange}
-          style={styles.input}
-        />
+        {/* Topbar */}
+        <div className="auth-card-topbar">
+          <span className="auth-card-title">Welcome Back</span>
+        </div>
 
-        <button onClick={handleLogin} style={styles.button}>
-          Login
-        </button>
+        {/* Brand */}
+        <div className="auth-brand">
+          <span className="auth-brand-name">ClassConnect</span>
+          <span className="auth-brand-sub">Sign in to your account</span>
+        </div>
 
-        <p>
-          Don’t have an account?{" "}
-          <span onClick={() => navigate("/signup")} style={styles.link}>
-            Signup
-          </span>
-        </p>
+        {/* Fields */}
+        <div className="auth-card-body">
+
+          <div className="auth-field">
+            <label>Email Address</label>
+            <input
+              type="email"
+              name="email"
+              placeholder="you@example.com"
+              value={form.email}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="auth-field">
+            <label>Password</label>
+            <input
+              type="password"
+              name="password"
+              placeholder="••••••••"
+              value={form.password}
+              onChange={handleChange}
+            />
+          </div>
+
+          <button className="auth-submit-btn" onClick={handleLogin}>
+            Login
+          </button>
+
+          <p className="auth-footer">
+            Don't have an account?{" "}
+            <button className="auth-link" onClick={() => navigate("/signup")}>
+              Sign up
+            </button>
+          </p>
+
+        </div>
       </div>
     </div>
   );
 };
 
 export default Login;
-
-// styles (same as yours)
-const styles = {
-  container: {
-    height: "100vh",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    background: "#f8f8f8",
-  },
-  card: {
-    padding: "30px",
-    border: "2px solid black",
-    boxShadow: "6px 6px 0 black",
-    background: "white",
-    width: "300px",
-    textAlign: "center",
-  },
-  input: {
-    width: "100%",
-    padding: "10px",
-    margin: "10px 0",
-    border: "2px solid black",
-  },
-  button: {
-    width: "100%",
-    padding: "10px",
-    background: "black",
-    color: "white",
-    border: "none",
-    cursor: "pointer",
-  },
-  link: {
-    color: "blue",
-    cursor: "pointer",
-  },
-};
