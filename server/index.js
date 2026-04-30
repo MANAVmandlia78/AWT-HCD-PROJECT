@@ -4,7 +4,6 @@ require("dotenv").config();
 const { Server } = require('socket.io');
 const jwt = require("jsonwebtoken"); // ✅ NEW
 const db = require("./config/db");
-const io = new Server({ cors: true });
 const cors = require("cors");
 const app = express();
 const authRoutes = require("./routes/authRoutes");
@@ -31,15 +30,21 @@ const allowedOrigins = [
   "https://awt-hcd-project-c7asqxnw-manavmandalia077-7613s-projects.vercel.app"
 ];
 
-app.use(cors({
-  origin: allowedOrigins,
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
-}));
+};
 
-// 🔥 IMPORTANT: handle preflight
-app.options("*", cors());
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); // ✅ FIXED
 app.use(express.json());
 app.use(bodyParser.json());
 app.use("/api/auth", authRoutes);
@@ -1875,5 +1880,11 @@ const PORT = process.env.PORT || 8000;
 const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`HTTP server running at PORT ${PORT}`);
 });
- 
-io.attach(server);
+
+const io = new Server(server, {
+  cors: {
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
+    credentials: true
+  }
+});
