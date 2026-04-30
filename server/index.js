@@ -37,7 +37,6 @@ app.options("*", (req, res) => {
 });
 
 
-app.use(customHeadersMiddleware);
 app.use(express.json());
 app.use(bodyParser.json());
 app.use("/api/auth", authRoutes);
