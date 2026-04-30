@@ -24,14 +24,14 @@ const verifyToken = (req, res, next) => {
     return res.status(401).json({ message: "Invalid token" });
   }
 };
+const cors = require("cors");
+
 app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "https://awt-hcd-project-c7asqxnw-manavmandalia077-7613s-projects.vercel.app"
-  ],
+  origin: true, // 🔥 allow dynamic origins
   credentials: true
 }));
 
+// 🔥 MUST HANDLE OPTIONS
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", req.headers.origin);
   res.header("Access-Control-Allow-Credentials", "true");
@@ -43,7 +43,8 @@ app.use((req, res, next) => {
   }
 
   next();
-}); // ✅ FIXED
+});
+app.use(customHeadersMiddleware);
 app.use(express.json());
 app.use(bodyParser.json());
 app.use("/api/auth", authRoutes);
