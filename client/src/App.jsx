@@ -32,8 +32,8 @@ import Calendar from "./Components/Calendar";
 import { SocketProvider } from "./Providers/Socket";
 import { PeerProvider } from "./Providers/Peer";
 
-import ProtectedRoute from "./components/ProtectedRoute";
-import PublicRoute from "./components/PublicRoute";
+import ProtectedRoute from "./Components/ProtectedRoute";
+import PublicRoute from "./Components/PublicRoute";
 
 const App = () => {
   return (
