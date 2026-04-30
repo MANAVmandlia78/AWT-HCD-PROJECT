@@ -26,25 +26,17 @@ const verifyToken = (req, res, next) => {
 };
 const cors = require("cors");
 
+// ✅ MUST be FIRST middleware
 app.use(cors({
-  origin: true,
-  credentials: true
+  origin: "*",   // 🔥 TEMPORARY (for debugging)
 }));
 
-app.options("*", cors()); // ✅ important
-
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", req.headers.origin);
-  res.header("Access-Control-Allow-Credentials", "true");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-
-  if (req.method === "OPTIONS") {
-    return res.status(200).json({});
-  }
-
-  next();
+// ✅ Explicit OPTIONS handler
+app.options("*", (req, res) => {
+  res.sendStatus(200);
 });
+
+
 app.use(customHeadersMiddleware);
 app.use(express.json());
 app.use(bodyParser.json());
