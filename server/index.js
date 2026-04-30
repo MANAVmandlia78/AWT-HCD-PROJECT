@@ -24,27 +24,26 @@ const verifyToken = (req, res, next) => {
     return res.status(401).json({ message: "Invalid token" });
   }
 };
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "https://awt-hcd-project-c7asqxnw-manavmandalia077-7613s-projects.vercel.app"
+  ],
+  credentials: true
+}));
 
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://awt-hcd-project-c7asqxnw-manavmandalia077-7613s-projects.vercel.app"
-];
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", req.headers.origin);
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
 
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
-};
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
 
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); // ✅ FIXED
+  next();
+}); // ✅ FIXED
 app.use(express.json());
 app.use(bodyParser.json());
 app.use("/api/auth", authRoutes);
