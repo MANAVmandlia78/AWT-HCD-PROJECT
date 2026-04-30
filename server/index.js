@@ -24,19 +24,19 @@ const verifyToken = (req, res, next) => {
     return res.status(401).json({ message: "Invalid token" });
   }
 };
-const cors = require("cors");
-
-// ✅ MUST be FIRST middleware
-app.use(cors({
-  origin: "*",   // 🔥 TEMPORARY (for debugging)
-}));
-
-// ✅ Explicit OPTIONS handler
-app.options("*", (req, res) => {
-  res.sendStatus(200);
+app.use((req, res, next) => {
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+  next();
 });
 
+// ✅ CORS
+app.use(cors({
+  origin: "*"
+}));
 
+// ✅ BODY
 app.use(express.json());
 app.use(bodyParser.json());
 app.use("/api/auth", authRoutes);
