@@ -27,11 +27,12 @@ const verifyToken = (req, res, next) => {
 const cors = require("cors");
 
 app.use(cors({
-  origin: true, // 🔥 allow dynamic origins
+  origin: true,
   credentials: true
 }));
 
-// 🔥 MUST HANDLE OPTIONS
+app.options("*", cors()); // ✅ important
+
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", req.headers.origin);
   res.header("Access-Control-Allow-Credentials", "true");
@@ -39,7 +40,7 @@ app.use((req, res, next) => {
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
 
   if (req.method === "OPTIONS") {
-    return res.sendStatus(200);
+    return res.status(200).json({});
   }
 
   next();
