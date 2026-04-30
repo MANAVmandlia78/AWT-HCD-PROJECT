@@ -1860,8 +1860,10 @@ io.on('connection', (socket) => {
 });
  
 // SERVER
-const server = app.listen(8000, '0.0.0.0', () => {
-  console.log('HTTP server running at PORT 8000');
+const PORT = process.env.PORT || 8000;
+
+const server = app.listen(PORT, '0.0.0.0', () => {
+  console.log(`HTTP server running at PORT ${PORT}`);
 });
  
 io.attach(server);
