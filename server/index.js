@@ -1,10 +1,11 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 require("dotenv").config();
-const { Server } = require('socket.io');
-const jwt = require("jsonwebtoken"); // ✅ NEW
+const jwt = require("jsonwebtoken");
 const db = require("./config/db");
 const cors = require("cors");
+const { Server } = require('socket.io');
+
 const app = express();
 const authRoutes = require("./routes/authRoutes");
 const verifyToken = (req, res, next) => {
@@ -24,9 +25,6 @@ const verifyToken = (req, res, next) => {
     return res.status(401).json({ message: "Invalid token" });
   }
 };
-const cors = require("cors");
-
-// ✅ allow your frontend explicitly (no "*")
 const allowedOrigin =
   "https://awt-hcd-project-cs7asqxnw-manavmandalia077-7613s-projects.vercel.app";
 
@@ -35,7 +33,6 @@ app.use(cors({
   credentials: true
 }));
 
-// ✅ MUST handle preflight BEFORE routes
 app.use((req, res, next) => {
   if (req.method === "OPTIONS") {
     res.header("Access-Control-Allow-Origin", allowedOrigin);
@@ -1886,7 +1883,7 @@ const server = app.listen(PORT, '0.0.0.0', () => {
 
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins,
+    origin: allowedOrigin,
     methods: ["GET", "POST"],
     credentials: true
   }
