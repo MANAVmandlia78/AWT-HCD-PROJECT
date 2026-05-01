@@ -25,24 +25,22 @@ const verifyToken = (req, res, next) => {
     return res.status(401).json({ message: "Invalid token" });
   }
 };
-const allowedOrigin =
-  "https://awt-hcd-project-cs7asqxnw-manavmandalia077-7613s-projects.vercel.app";
+const allowedOrigin = "https://awt-hcd-project-cs7asqxnw-manavmandalia077-7613s-projects.vercel.app";
 
 app.use(cors({
-  origin: allowedOrigin,
-  credentials: true
+  origin: (origin, callback) => {
+    if (!origin || origin === allowedOrigin) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 }));
 
-app.use((req, res, next) => {
-  if (req.method === "OPTIONS") {
-    res.header("Access-Control-Allow-Origin", allowedOrigin);
-    res.header("Access-Control-Allow-Credentials", "true");
-    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    return res.sendStatus(200);
-  }
-  next();
-});
+app.options("*", cors()); // ✅ handles ALL preflight requests in one line
 
 // ✅ BODY
 app.use(express.json());
