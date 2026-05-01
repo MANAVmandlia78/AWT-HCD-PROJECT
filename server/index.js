@@ -1586,6 +1586,21 @@ const getParticipantsPayload = (roomState) =>
     userId,
   }));
  
+// SERVER
+const PORT = process.env.PORT || 8000;
+
+const server = app.listen(PORT, '0.0.0.0', () => {
+  console.log(`HTTP server running at PORT ${PORT}`);
+});
+
+const io = new Server(server, {
+  cors: {
+    origin: allowedOrigin,
+    methods: ["GET", "POST"],
+    credentials: true
+  }
+});
+
 // 🔥 SOCKET CONNECTION
 io.on('connection', (socket) => {
  
@@ -1875,19 +1890,4 @@ io.on('connection', (socket) => {
     }
   });
  
-});
- 
-// SERVER
-const PORT = process.env.PORT || 8000;
-
-const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log(`HTTP server running at PORT ${PORT}`);
-});
-
-const io = new Server(server, {
-  cors: {
-    origin: allowedOrigin,
-    methods: ["GET", "POST"],
-    credentials: true
-  }
 });
