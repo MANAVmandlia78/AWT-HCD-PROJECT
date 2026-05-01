@@ -40,7 +40,12 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
 
-app.options("*", cors()); // ✅ handles ALL preflight requests in one line
+app.use((req, res, next) => {
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+  next();
+});
 
 // ✅ BODY
 app.use(express.json());
