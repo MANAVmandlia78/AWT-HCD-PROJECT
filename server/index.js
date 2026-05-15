@@ -25,11 +25,14 @@ const verifyToken = (req, res, next) => {
     return res.status(401).json({ message: "Invalid token" });
   }
 };
-const allowedOrigin = "https://awt-hcd-project-cs7asqxnw-manavmandalia077-7613s-projects.vercel.app";
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://awt-hcd-project-cs7asqxnw-manavmandalia077-7613s-projects.vercel.app"
+];
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || origin === allowedOrigin) {
+    if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
       callback(new Error("Not allowed by CORS"));
@@ -1510,14 +1513,16 @@ app.post("/api/assignments", async (req, res) => {
   }
 });
 app.get("/api/assignments/detail/:id", verifyToken, (req, res) => {
-  const userId = req.user.id; // from token
+  const userId = req.user.id;
 
   const query = `
     SELECT 
       assignments.*, 
       users.name AS teacher_name, 
       courses.title AS course_name,
-      submissions.id AS submission_id
+      submissions.id AS submission_id,
+      submissions.grade,
+      submissions.feedback
     FROM assignments
     JOIN users ON assignments.teacher_id = users.id
     JOIN courses ON assignments.course_id = courses.id
@@ -1595,7 +1600,10 @@ const server = app.listen(PORT, '0.0.0.0', () => {
 
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigin,
+    origin: [
+      "http://localhost:5173",
+      "https://awt-hcd-project-cs7asqxnw-manavmandalia077-7613s-projects.vercel.app"
+    ],
     methods: ["GET", "POST"],
     credentials: true
   }

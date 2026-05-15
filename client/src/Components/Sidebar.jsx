@@ -64,28 +64,29 @@ const Sidebar = () => {
 
       {/* MAIN MENU */}
       {menuItems.map((item) => (
-        <div
-          key={item.name}
-          className={`nav-item ${active === item.name ? "active" : ""}`}
-          onClick={() => handleNav(item)}
-        >
-          <span className="nav-icon">{item.icon}</span>
-          <span>{item.name}</span>
-          {item.badge && <span className="nav-badge">{item.badge}</span>}
-        </div>
-      ))}
+  <div
+    key={item.name}
+    data-label={item.name}           
+    className={`nav-item ${active === item.name ? "active" : ""}`}
+    onClick={() => handleNav(item)}
+  >
+    <span className="nav-icon">{item.icon}</span>
+    <span>{item.name}</span>
+    {item.badge && <span className="nav-badge">{item.badge}</span>}
+  </div>
+))}
 
-      {/* ACCOUNT ITEMS */}
-      {accountItems.map((item) => (
-        <div
-          key={item.name}
-          className={`nav-item ${active === item.name ? "active" : ""}`}
-          onClick={() => handleClick(item)}
-        >
-          <span className="nav-icon">{item.icon}</span>
-          <span>{item.name}</span>
-        </div>
-      ))}
+{accountItems.map((item) => (
+  <div
+    key={item.name}
+    data-label={item.name}           
+    className={`nav-item ${active === item.name ? "active" : ""}`}
+    onClick={() => handleClick(item)}
+  >
+    <span className="nav-icon">{item.icon}</span>
+    <span>{item.name}</span>
+  </div>
+))}
 
       {/* USER */}
       <div className="sidebar-bottom">

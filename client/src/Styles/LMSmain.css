@@ -2,3 +2,23 @@
   display: flex;
   min-height: 100vh;
 }
+
+.lms-layout > *:not(.sidebar) {
+  margin-left: var(--sidebar-width, 260px);
+  width: calc(100% - var(--sidebar-width, 260px));
+  min-height: 100vh;
+  overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  .lms-layout {
+    flex-direction: column;
+  }
+
+  .lms-layout > *:not(.sidebar) {
+    margin-left: 0;
+    width: 100%;
+    min-height: 100vh;
+    padding-bottom: 70px; /* space for bottom nav */
+  }
+}

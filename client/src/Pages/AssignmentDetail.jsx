@@ -5,6 +5,22 @@ import { storage } from "../firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import "../Styles/assignmentDetail.css";
 
+const GRADE_CONFIG = {
+  "A+": { bg: "#E1F5EE", color: "#0F6E56", border: "#5DCAA5", label: "Excellent work!", accent: "#6bddaa" },
+  "A":  { bg: "#E1F5EE", color: "#0F6E56", border: "#5DCAA5", label: "Excellent work!", accent: "#6bddaa" },
+  "B":  { bg: "#E6F1FB", color: "#185FA5", border: "#85B7EB", label: "Good work!", accent: "#6b8eff" },
+  "C":  { bg: "#FAEEDA", color: "#854F0B", border: "#EF9F27", label: "Satisfactory", accent: "#ffc96b" },
+  "D":  { bg: "#FCEBEB", color: "#A32D2D", border: "#F09595", label: "Needs improvement", accent: "#ff6b9d" },
+  "F":  { bg: "#FCEBEB", color: "#A32D2D", border: "#F09595", label: "Needs improvement", accent: "#ff6b9d" },
+};
+
+const getGradeConfig = (grade) => {
+  if (!grade) return null;
+  return GRADE_CONFIG[grade.toUpperCase()] || {
+    bg: "#f5f5f5", color: "#444", border: "#ccc", label: "Graded", accent: "#888"
+  };
+};
+
 const AssignmentDetail = () => {
   const { assignmentId } = useParams();
   const navigate = useNavigate();
@@ -25,22 +41,20 @@ const AssignmentDetail = () => {
   }, [assignmentId]);
 
   const fetchAssignment = async () => {
-  try {
-    const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/assignments/detail/${assignmentId}`,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-
-    setAssignment(res.data);
-
-    if (res.data.alreadySubmitted) {
-      setSubmitted(true);
-      setStarted(true); // optional: skip start button
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/assignments/detail/${assignmentId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setAssignment(res.data);
+      if (res.data.alreadySubmitted) {
+        setSubmitted(true);
+        setStarted(true);
+      }
+    } catch (err) {
+      console.log(err);
     }
-
-  } catch (err) {
-    console.log(err);
-  }
-};
+  };
 
   const handleFileChange = (e) => {
     const selected = e.target.files[0];
@@ -66,9 +80,7 @@ const AssignmentDetail = () => {
       uploadTask.on(
         "state_changed",
         (snapshot) => {
-          const pct = Math.round(
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-          );
+          const pct = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
           setProgress(pct);
         },
         (error) => {
@@ -78,7 +90,8 @@ const AssignmentDetail = () => {
         },
         async () => {
           const fileUrl = await getDownloadURL(uploadTask.snapshot.ref);
-          await axios.post(`${import.meta.env.VITE_API_URL}/api/submissions`,
+          await axios.post(
+            `${import.meta.env.VITE_API_URL}/api/submissions`,
             { assignment_id: assignmentId, file_url: fileUrl },
             { headers: { Authorization: `Bearer ${token}` } }
           );
@@ -103,16 +116,16 @@ const AssignmentDetail = () => {
     );
   }
 
+  const gradeConfig = getGradeConfig(assignment.grade);
+
   return (
     <div className="assignment-detail-container">
       <div className="gradient-mid" />
 
-      {/* Back button */}
       <button className="detail-back-btn" onClick={() => navigate(-1)}>
         ← Back
       </button>
 
-      {/* Main card */}
       <div className="detail-card">
 
         {/* Topbar */}
@@ -168,17 +181,92 @@ const AssignmentDetail = () => {
             <p className="detail-upload-heading">Submit Your Work</p>
 
             {submitted ? (
-              <div className="detail-success">
-                <div className="detail-success-check">
-                  <svg viewBox="0 0 52 52" fill="none">
-                    <circle className="check-circle" cx="26" cy="26" r="25" stroke="#6bddaa" strokeWidth="2" />
-                    <path className="check-mark" d="M14 27l8 8 16-16" stroke="#6bddaa" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
+              <div>
+                {/* Submitted check */}
+                <div className="detail-success">
+                  <div className="detail-success-check">
+                    <svg viewBox="0 0 52 52" fill="none">
+                      <circle className="check-circle" cx="26" cy="26" r="25" stroke="#6bddaa" strokeWidth="2" />
+                      <path className="check-mark" d="M14 27l8 8 16-16" stroke="#6bddaa" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="detail-success-text">Assignment Submitted!</p>
+                    <p className="detail-success-sub">
+                      {assignment.grade
+                        ? "Your teacher has reviewed and graded your submission."
+                        : "Your work has been received. Waiting for your teacher to grade it."}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="detail-success-text">Assignment Submitted!</p>
-                  <p className="detail-success-sub">Your work has been received successfully.</p>
-                </div>
+
+                {/* Grade card — only shown when graded */}
+                {assignment.grade && gradeConfig && (
+                  <div className="detail-grade-card">
+
+                    {/* Grade card topbar */}
+                    <div
+                      className="detail-grade-topbar"
+                      style={{ borderBottom: `1.5px solid ${gradeConfig.border}` }}
+                    >
+                      <span
+                        className="detail-grade-dot"
+                        style={{ background: gradeConfig.accent }}
+                      />
+                      <span className="detail-grade-topbar-label">Grade Result</span>
+                      <span
+                        className="detail-grade-pill"
+                        style={{
+                          background: gradeConfig.bg,
+                          color: gradeConfig.color,
+                          borderColor: gradeConfig.border,
+                        }}
+                      >
+                        ✓ Graded
+                      </span>
+                    </div>
+
+                    {/* Grade card body */}
+                    <div className="detail-grade-body">
+
+                      {/* Grade badge */}
+                      <div
+                        className="detail-grade-badge"
+                        style={{
+                          background: gradeConfig.bg,
+                          color: gradeConfig.color,
+                          border: `2px solid ${gradeConfig.border}`,
+                        }}
+                      >
+                        {assignment.grade}
+                      </div>
+
+                      {/* Grade info */}
+                      <div className="detail-grade-info">
+                        <p className="detail-grade-title">{gradeConfig.label}</p>
+                        <p className="detail-grade-sub">
+                          Graded by <strong>{assignment.teacher_name}</strong>
+                          {assignment.course_name ? ` · ${assignment.course_name}` : ""}
+                        </p>
+
+                        {/* Feedback */}
+                        {assignment.feedback && (
+                          <div
+                            className="detail-grade-feedback"
+                            style={{ borderLeftColor: gradeConfig.accent }}
+                          >
+                            <div className="detail-grade-feedback-label">
+                              💬 Teacher's Feedback
+                            </div>
+                            <div className="detail-grade-feedback-text">
+                              {assignment.feedback}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
             ) : !started ? (
@@ -232,7 +320,6 @@ const AssignmentDetail = () => {
                     <div className="detail-progress-track">
                       <div className="detail-progress-fill" style={{ width: `${progress}%` }} />
                     </div>
-                    {/* Flying papers animation */}
                     <div className="detail-papers-wrap">
                       {[0, 1, 2].map((i) => (
                         <div key={i} className={`detail-paper detail-paper-${i}`}>

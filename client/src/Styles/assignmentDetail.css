@@ -93,6 +93,138 @@
   font-family: 'Comic Neue', sans-serif;
 }
 
+/* ─── GRADE CARD ─────────────────────────────────────── */
+.detail-grade-card {
+  margin-top: 16px;
+  border: 2px solid #000;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 4px 4px 0 #000;
+  animation: panelSlideIn 0.4s ease;
+}
+
+.detail-grade-topbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #f0fdf8, #e0faf0);
+  border-bottom: 2px solid #000;
+}
+
+.detail-grade-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 1.5px solid #000;
+}
+
+.detail-grade-topbar-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #000;
+  flex: 1;
+}
+
+.detail-grade-pill {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1.5px solid #000;
+  box-shadow: 2px 2px 0 #000;
+}
+
+.detail-grade-body {
+  padding: 20px;
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  background: #fff;
+}
+
+.detail-grade-badge {
+  width: 76px;
+  height: 76px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 900;
+  flex-shrink: 0;
+  letter-spacing: -1px;
+  border-width: 2px;
+  border-style: solid;
+  box-shadow: 3px 3px 0 #000;
+  font-family: 'Comic Neue', sans-serif;
+}
+
+.detail-grade-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+}
+
+.detail-grade-title {
+  font-size: 15px;
+  font-weight: 900;
+  color: #000;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.detail-grade-sub {
+  font-size: 11px;
+  font-weight: 700;
+  color: #888;
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+
+.detail-grade-feedback {
+  margin-top: 12px;
+  border: 2px solid #000;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 3px 3px 0 #000;
+}
+
+.detail-grade-feedback-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #888;
+  padding: 8px 14px;
+  border-bottom: 2px solid #000;
+  background: #fafafa;
+  display: block;
+}
+
+.detail-grade-feedback-text {
+  font-size: 13px;
+  font-weight: 700;
+  color: #333;
+  line-height: 1.65;
+  padding: 12px 14px;
+  background: #fff;
+  margin: 0;
+  border-left: 4px solid #6bddaa;
+}
+
+/* ─── RESPONSIVE (grade card) ────────────────────────── */
+@media (max-width: 700px) {
+  .detail-grade-body { flex-direction: column; align-items: center; text-align: center; }
+  .detail-grade-feedback { text-align: left; }
+}
+
 .detail-back-btn:hover {
   transform: translate(-2px, -2px);
   box-shadow: 5px 5px 0 #000;

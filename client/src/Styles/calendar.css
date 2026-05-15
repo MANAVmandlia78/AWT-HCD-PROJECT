@@ -12,6 +12,7 @@
   min-height: 100vh;
   position: relative;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 /* ─── GRADIENT BLOBS ────────────────────────────────── */
@@ -135,7 +136,7 @@
 /* DAY BOX — base (no assignment) */
 .day-box {
   height: 90px;
-  width: 150px;
+  width: 100%;          /* ← was fixed 150px, now fluid */
   border: 3px solid #000;
   border-radius: 10px;
   padding: 8px 10px;
@@ -147,6 +148,139 @@
   position: relative;
   box-sizing: border-box;
   transition: transform 0.15s, box-shadow 0.15s, border-width 0.15s;
+}
+
+@media (max-width: 900px) {
+  .calendar-container {
+    padding: 20px 16px;
+  }
+
+  .calendar-header h2 {
+    font-size: 20px;
+  }
+
+  .legend {
+    gap: 8px;
+  }
+
+  .legend-item {
+    font-size: 10px;
+    padding: 2px 7px;
+  }
+
+  .calendar-grid {
+    gap: 8px;
+  }
+
+  .day-box {
+    height: 75px;
+    padding: 6px 7px;
+  }
+
+  .day-number {
+    font-size: 13px;
+  }
+
+  .subject {
+    font-size: 9px;
+  }
+}
+
+/* ─── MOBILE (≤768px) ───────────────────────────── */
+@media (max-width: 768px) {
+  .calendar-container {
+    margin-left: 0;
+    width: 100%;
+    padding: 16px 10px;
+    padding-bottom: 80px; /* space for bottom nav */
+  }
+
+  .calendar-container::after {
+    left: -60px; /* reset sidebar offset */
+  }
+
+  .calendar-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .calendar-header h2 {
+    font-size: 18px;
+  }
+
+  .legend {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .weekday-label {
+    font-size: 10px;
+    padding: 4px 0;
+  }
+
+  .calendar-grid {
+    gap: 5px;
+  }
+
+  .day-box {
+    height: 60px;
+    padding: 4px 5px;
+    border-radius: 7px;
+    border-width: 2px;
+    box-shadow: 2px 2px 0 #000;
+  }
+
+  .day-box.past   { box-shadow: 2px 2px 0 #cc0000; }
+  .day-box.future { box-shadow: 2px 2px 0 #2a7a2a; }
+  .day-box.today  { box-shadow: 2px 2px 0 #000; }
+
+  .day-number {
+    font-size: 11px;
+  }
+
+  .today-badge {
+    font-size: 7px;
+    padding: 1px 3px;
+    top: 4px;
+    right: 4px;
+  }
+
+  .subject {
+    font-size: 8px;
+  }
+
+  .assignment {
+    font-size: 8px;
+    padding: 1px 3px;
+  }
+}
+
+/* ─── SMALL MOBILE (≤480px) ─────────────────────── */
+@media (max-width: 480px) {
+  .weekday-label {
+    font-size: 8px;
+    letter-spacing: 0;
+  }
+
+  .day-box {
+    height: 50px;
+    padding: 3px 4px;
+    border-radius: 5px;
+  }
+
+  .day-number {
+    font-size: 10px;
+  }
+
+  .subject {
+    display: none; /* too cramped — just show the color status */
+  }
+
+  .today-badge {
+    display: none;
+  }
 }
 
 .day-box.blank {
